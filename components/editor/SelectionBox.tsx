@@ -16,7 +16,7 @@ export function SelectionBox({
 }) {
   return (
     <div
-      className="pointer-events-none absolute border border-studio-cyan shadow-[0_0_0_1px_rgba(35,211,238,0.2)]"
+      className="pointer-events-none absolute border border-blue-500 shadow-[0_0_0_1px_rgba(37,99,235,0.18)]"
       style={{
         left: object.x,
         top: object.y,

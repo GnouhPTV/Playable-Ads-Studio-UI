@@ -32,13 +32,13 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/76 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4 backdrop-blur-sm">
       <section className="studio-panel w-full max-w-3xl rounded-lg p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-normal text-studio-cyan">First editor visit</p>
-            <h2 className="mt-2 text-2xl font-black text-white">Build your playable in four passes</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-studio-muted">
+            <p className="text-xs font-black uppercase tracking-normal text-blue-700">First editor visit</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Build your playable in four passes</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
               This editor is intentionally small. Start with the scene flow, then tune gameplay,
               assets, and export readiness.
             </p>
@@ -46,7 +46,7 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="grid size-10 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/6 text-studio-muted hover:text-white"
+            className="grid size-10 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-slate-900"
             title="Close onboarding"
           >
             <X className="size-4" aria-hidden />
@@ -55,17 +55,17 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
 
         <div className="mt-5 grid gap-3 md:grid-cols-4">
           {steps.map((step, index) => (
-            <article key={step.title} className="rounded-lg border border-white/8 bg-white/[0.04] p-4">
-              <div className="mb-3 grid size-9 place-items-center rounded-lg bg-cyan-300/12 text-studio-cyan">
+            <article key={step.title} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="mb-3 grid size-9 place-items-center rounded-lg bg-blue-50 text-blue-700">
                 {index + 1}
               </div>
-              <h3 className="text-sm font-black text-white">{step.title}</h3>
-              <p className="mt-2 text-xs leading-5 text-studio-muted">{step.text}</p>
+              <h3 className="text-sm font-black text-slate-950">{step.title}</h3>
+              <p className="mt-2 text-xs leading-5 text-slate-500">{step.text}</p>
             </article>
           ))}
         </div>
 
-        <div className="mt-5 grid gap-3 rounded-lg border border-lime-300/16 bg-lime-300/8 p-4 text-sm leading-6 text-lime-50 md:grid-cols-3">
+        <div className="mt-5 grid gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 md:grid-cols-3">
           <span className="inline-flex items-center gap-2">
             <MousePointer2 className="size-4" aria-hidden />
             Interact inside preview
@@ -81,14 +81,14 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
         </div>
 
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 text-xs text-studio-muted">
-            <CheckCircle2 className="size-4 text-lime-300" aria-hidden />
+          <span className="inline-flex items-center gap-2 text-xs text-slate-500">
+            <CheckCircle2 className="size-4 text-emerald-600" aria-hidden />
             You can reopen this guidance from the Learning Notes panel.
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-2 rounded-lg bg-studio-cyan px-4 py-3 text-sm font-extrabold text-zinc-950"
+            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700"
           >
             Start Editing
             <ArrowRight className="size-4" aria-hidden />

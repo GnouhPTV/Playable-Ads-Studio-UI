@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Eye, EyeOff, Lock, Trash2, Unlock } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff, Layers3, Lock, Trash2, Unlock } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
 
 export function LayersPanel({ embedded = false }: { embedded?: boolean }) {
@@ -34,36 +34,46 @@ export function LayersPanel({ embedded = false }: { embedded?: boolean }) {
           No objects in this scene yet.
         </div>
       ) : (
-        <div className="grid max-h-52 gap-2 overflow-auto pr-1 md:grid-cols-2 xl:grid-cols-3">
+        <div className="scrollbar-soft grid max-h-64 gap-2 overflow-auto pr-1">
           {layers.map((object) => {
             const active = object.id === selectedObjectId;
 
             return (
               <article
                 key={object.id}
-                className={`rounded-md border p-2 ${
-                  active ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white"
+                className={`rounded-lg border p-3 shadow-sm ${
+                  active ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => selectObject(object.id)}
-                  className="mb-2 block w-full text-left text-[10px] font-black uppercase tracking-normal text-slate-500"
-                >
-                  {object.type} - z{object.zIndex}
-                </button>
-                <input
-                  value={object.name}
-                  onChange={(event) => updateObject(object.id, { name: event.target.value })}
-                  className="studio-input py-2 text-xs font-bold"
-                  aria-label="Layer name"
-                />
-                <div className="mt-2 flex flex-wrap gap-1">
-                  <IconButton label="Toggle visibility" onClick={() => hideObject(object.id)} icon={object.hidden ? EyeOff : Eye} />
-                  <IconButton label="Toggle lock" onClick={() => lockObject(object.id)} icon={object.locked ? Lock : Unlock} />
-                  <IconButton label="Move layer up" onClick={() => bringForward(object.id)} icon={ArrowUp} />
-                  <IconButton label="Move layer down" onClick={() => sendBackward(object.id)} icon={ArrowDown} />
-                  <IconButton label="Delete layer" onClick={() => deleteObject(object.id)} icon={Trash2} danger />
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    onClick={() => selectObject(object.id)}
+                    className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                  >
+                    <span className="grid size-10 shrink-0 place-items-center rounded-md bg-white text-blue-600 shadow-sm">
+                      <Layers3 className="size-4" aria-hidden />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-black text-slate-950">{object.name}</span>
+                      <span className="block text-xs font-bold uppercase text-slate-500">
+                        {object.type} - z{object.zIndex}
+                      </span>
+                    </span>
+                  </button>
+                  <input
+                    value={object.name}
+                    onChange={(event) => updateObject(object.id, { name: event.target.value })}
+                    className="studio-input py-2 text-xs font-bold sm:max-w-[180px]"
+                    aria-label="Layer name"
+                  />
+                  <div className="flex flex-wrap gap-1">
+                    <IconButton label="Toggle visibility" onClick={() => hideObject(object.id)} icon={object.hidden ? EyeOff : Eye} />
+                    <IconButton label="Toggle lock" onClick={() => lockObject(object.id)} icon={object.locked ? Lock : Unlock} />
+                    <IconButton label="Move layer up" onClick={() => bringForward(object.id)} icon={ArrowUp} />
+                    <IconButton label="Move layer down" onClick={() => sendBackward(object.id)} icon={ArrowDown} />
+                    <IconButton label="Delete layer" onClick={() => deleteObject(object.id)} icon={Trash2} danger />
+                  </div>
                 </div>
               </article>
             );
@@ -93,7 +103,7 @@ function IconButton({
       className={`grid size-8 place-items-center rounded-md border ${
         danger
           ? "border-red-200 bg-red-50 text-red-700"
-          : "border-slate-200 bg-white text-slate-500 hover:text-slate-900"
+          : "border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:text-slate-900"
       }`}
     >
       <Icon className="size-3.5" aria-hidden />

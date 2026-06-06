@@ -17,8 +17,8 @@ export function PropertiesPanel({ project, selectedScene }: PropertiesPanelProps
   return (
     <aside className="studio-panel scrollbar-soft max-h-[calc(100vh-97px)] overflow-auto rounded-lg p-4">
       <div className="mb-5">
-        <h2 className="text-sm font-black uppercase tracking-normal text-white">Properties</h2>
-        <p className="mt-1 text-xs leading-5 text-studio-muted">Live preview updates as values change.</p>
+        <h2 className="text-sm font-black uppercase tracking-normal text-slate-950">Properties</h2>
+        <p className="mt-1 text-xs leading-5 text-slate-500">Live preview updates as values change.</p>
       </div>
 
       <Section title="Game Settings">
@@ -170,8 +170,8 @@ export function PropertiesPanel({ project, selectedScene }: PropertiesPanelProps
 
 function Section({ title, children }: Readonly<{ title: string; children: React.ReactNode }>) {
   return (
-    <section className="mb-5 rounded-lg border border-white/8 bg-white/[0.035] p-4">
-      <h3 className="mb-4 text-sm font-black text-white">{title}</h3>
+    <section className="mb-5 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="mb-4 text-sm font-black text-slate-950">{title}</h3>
       <div className="space-y-3">{children}</div>
     </section>
   );
@@ -255,7 +255,7 @@ function ColorField({
           type="color"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-14 rounded-lg border border-white/10 bg-transparent p-1"
+          className="h-11 w-14 rounded-lg border border-slate-200 bg-white p-1"
         />
         <input className="studio-input" value={value} onChange={(event) => onChange(event.target.value)} />
       </span>

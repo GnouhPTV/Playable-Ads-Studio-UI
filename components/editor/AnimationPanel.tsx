@@ -21,8 +21,8 @@ export function AnimationPanel({ object }: { object: EditorObject }) {
   const animation = object.animations[0] ?? "none";
 
   return (
-    <section className="rounded-lg border border-white/8 bg-white/[0.035] p-4">
-      <h3 className="text-sm font-black text-white">Animation</h3>
+    <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="text-sm font-black text-slate-950">Animation</h3>
       <label className="mt-3 block">
         <span className="studio-label">Animation preset</span>
         <select

@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, TriangleAlert, X, XCircle } from "lucide-react";
+import { CheckCircle2, ShieldCheck, TriangleAlert, X, XCircle } from "lucide-react";
 import type { PlayableProject } from "@/types/project";
 import { validateProjectForExport, type ValidationItem } from "@/lib/editor/validators";
 
@@ -23,14 +23,19 @@ export function ValidationModal({
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4 backdrop-blur-sm">
       <section className="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-lg border border-slate-200 bg-white shadow-panel">
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
-          <div>
-            <h2 className="text-2xl font-black text-slate-950">Validation Results</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              {errors} error(s), {warnings} warning(s). Fix errors before production-style export.
-            </p>
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 bg-slate-50 p-5">
+          <div className="flex gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-emerald-600 text-white shadow-[0_12px_24px_rgba(5,150,105,0.18)]">
+              <ShieldCheck className="size-5" aria-hidden />
+            </span>
+            <div>
+              <h2 className="text-2xl font-black text-slate-950">Validation Results</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {errors} error(s), {warnings} warning(s). Fix errors before production-style export.
+              </p>
+            </div>
           </div>
-          <button type="button" onClick={onClose} className="grid size-10 place-items-center rounded-md border border-slate-200 text-slate-500 hover:text-slate-900">
+          <button type="button" onClick={onClose} className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 hover:text-slate-900">
             <X className="size-4" aria-hidden />
           </button>
         </div>

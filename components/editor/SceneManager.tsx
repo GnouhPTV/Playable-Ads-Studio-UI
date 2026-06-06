@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { Clapperboard, Copy, Gamepad2, Plus, Trash2, Trophy } from "lucide-react";
 import type { SceneType } from "@/types/project";
 import { useEditorStore } from "@/store/editorStore";
 
@@ -9,6 +9,12 @@ const sceneTypes: { value: SceneType; label: string }[] = [
   { value: "gameplay", label: "Gameplay Scene" },
   { value: "endCard", label: "End Card Scene" }
 ];
+
+const sceneIcons: Record<SceneType, typeof Clapperboard> = {
+  intro: Clapperboard,
+  gameplay: Gamepad2,
+  endCard: Trophy
+};
 
 export function SceneManager() {
   const project = useEditorStore((state) => state.project);
@@ -33,19 +39,23 @@ export function SceneManager() {
       <div className="space-y-2">
         {project.scenes.map((scene) => {
           const active = scene.id === currentSceneId;
+          const Icon = sceneIcons[scene.type];
 
           return (
             <article
               key={scene.id}
-              className={`rounded-lg border p-3 ${
-                active ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white"
+              className={`rounded-lg border p-3 shadow-sm ${
+                active ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"
               }`}
             >
               <button
                 type="button"
                 onClick={() => setSelectedScene(scene.id)}
-                className="mb-2 block w-full text-left text-xs font-black uppercase tracking-normal text-slate-500"
+                className="mb-2 flex w-full items-center gap-2 text-left text-xs font-black uppercase tracking-normal text-slate-500"
               >
+                <span className="grid size-8 place-items-center rounded-md bg-white text-blue-600 shadow-sm">
+                  <Icon className="size-4" aria-hidden />
+                </span>
                 {scene.type}
               </button>
               <input
@@ -58,7 +68,7 @@ export function SceneManager() {
                 <button
                   type="button"
                   onClick={() => duplicateScene(scene.id)}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-700"
+                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
                 >
                   <Copy className="size-3.5" aria-hidden />
                   Duplicate
@@ -84,9 +94,9 @@ export function SceneManager() {
             key={sceneType.value}
             type="button"
             onClick={() => addScene(sceneType.value)}
-            className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
+            className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
           >
-            <Plus className="size-4 text-studio-cyan" aria-hidden />
+            <Plus className="size-4 text-blue-600" aria-hidden />
             Add {sceneType.label}
           </button>
         ))}

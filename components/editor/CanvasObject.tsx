@@ -71,7 +71,7 @@ export function CanvasObject({
   return (
     <div
       data-object-id={object.id}
-      className={`select-none ${className} ${selected ? "ring-1 ring-cyan-300/30" : ""}`}
+      className={`select-none ${className} ${selected ? "ring-1 ring-blue-500/25" : ""}`}
       style={style}
       onPointerDown={handlePointerDown}
     >
@@ -216,7 +216,7 @@ function renderObject(
           void audio.play();
         }
       }}
-      className="flex h-full w-full items-center justify-center gap-2 rounded-lg border border-cyan-300/30 bg-cyan-300/12 text-xs font-black text-cyan-100"
+      className="flex h-full w-full items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 text-xs font-black text-blue-700"
     >
       <Music2 className="size-4" aria-hidden />
       Audio
@@ -226,7 +226,7 @@ function renderObject(
 
 function Placeholder({ label }: { label: string }) {
   return (
-    <div className="grid h-full w-full place-items-center rounded-lg border border-dashed border-white/18 bg-white/8 text-xs font-black text-white/70">
+    <div className="grid h-full w-full place-items-center rounded-lg border border-dashed border-slate-300 bg-white/80 text-xs font-black text-slate-500">
       {label}
     </div>
   );

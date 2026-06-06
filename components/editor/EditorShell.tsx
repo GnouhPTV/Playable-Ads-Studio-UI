@@ -94,7 +94,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
           </p>
           <Link
             href="/templates"
-            className="mt-5 inline-flex items-center gap-2 rounded-md bg-sky-600 px-4 py-3 text-sm font-extrabold text-white"
+            className="mt-5 inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700"
           >
             <Library className="size-4" aria-hidden />
             Open Templates
@@ -126,23 +126,23 @@ export function EditorShell({ projectId }: EditorShellProps) {
   }
 
   return (
-    <div className="min-h-screen bg-studio-ink text-studio-text">
-      <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
+    <div className="min-h-screen bg-[#f4f7fb] text-studio-text">
+      <header className="sticky top-0 z-40 border-b border-slate-200/90 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.03)] backdrop-blur">
         <div className="flex min-h-16 flex-wrap items-center gap-3 px-4 lg:flex-nowrap">
           <Link
             href="/"
-            className="grid size-10 shrink-0 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:text-sky-700"
+            className="grid size-10 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
             title="Dashboard"
           >
             <Home className="size-4" aria-hidden />
           </Link>
 
           <div className="min-w-[220px] flex-1">
-            <div className="mb-1 text-xs font-bold text-slate-500">Dashboard / {project.name}</div>
+            <div className="mb-1 text-xs font-bold text-slate-500">Dashboard / Editor</div>
             <input
               value={project.name}
               onChange={(event) => updateProjectName(event.target.value)}
-              className="studio-input max-w-xl border-transparent bg-transparent px-0 py-0 text-lg font-black"
+              className="studio-input max-w-xl border-transparent bg-transparent px-0 py-0 text-lg font-black shadow-none focus:border-transparent focus:shadow-none"
               aria-label="Project name"
             />
             <div className="text-xs text-slate-500">
@@ -150,11 +150,11 @@ export function EditorShell({ projectId }: EditorShellProps) {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="scrollbar-soft flex flex-wrap items-center gap-2 overflow-x-auto">
             <button
               type="button"
               onClick={() => saveProject()}
-              className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-3 py-2 text-sm font-extrabold text-white"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-extrabold text-white shadow-[0_10px_22px_rgba(37,99,235,0.18)] transition hover:bg-blue-700"
             >
               <Save className="size-4" aria-hidden />
               Save
@@ -163,7 +163,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
               type="button"
               onClick={undo}
               disabled={undoStack.length === 0}
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
             >
               <Undo2 className="size-4" aria-hidden />
               Undo
@@ -172,7 +172,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
               type="button"
               onClick={redo}
               disabled={redoStack.length === 0}
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
             >
               <Redo2 className="size-4" aria-hidden />
               Redo
@@ -180,7 +180,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             <button
               type="button"
               onClick={() => setEditorMode(editorMode === "preview" ? "design" : "preview")}
-              className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-bold ${
+              className={`inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-bold ${
                 editorMode === "preview"
                   ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                   : "border-slate-200 bg-white text-slate-700"
@@ -192,7 +192,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             <button
               type="button"
               onClick={() => setValidationOpen(true)}
-              className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-sm font-bold text-emerald-700 transition hover:border-emerald-300"
             >
               <CheckCircle2 className="size-4" aria-hidden />
               Validate
@@ -200,7 +200,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             <button
               type="button"
               onClick={() => setExportOpen(true)}
-              className="inline-flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-700"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 text-sm font-bold text-blue-700 transition hover:border-blue-300"
             >
               <Download className="size-4" aria-hidden />
               Export
@@ -212,7 +212,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             <button
               type="button"
               disabled
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-bold text-slate-400"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-slate-100 px-3 text-sm font-bold text-slate-400"
               title="Publish is a future backend feature."
             >
               <Rocket className="size-4" aria-hidden />
@@ -221,7 +221,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             <button
               type="button"
               onClick={resetFromTemplate}
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition hover:border-sky-200"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
               title="Reset template defaults"
             >
               <RefreshCcw className="size-4" aria-hidden />
@@ -230,7 +230,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             <button
               type="button"
               onClick={handleDuplicate}
-              className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:text-slate-900"
+              className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:text-slate-900"
               title="Duplicate project"
             >
               <Copy className="size-4" aria-hidden />
@@ -245,7 +245,7 @@ export function EditorShell({ projectId }: EditorShellProps) {
             </button>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700"
             >
               <UserCircle2 className="size-4" aria-hidden />
               User

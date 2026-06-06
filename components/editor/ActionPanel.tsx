@@ -25,15 +25,15 @@ export function ActionPanel({ object }: { object: EditorObject }) {
 
   if (!isClickable) {
     return (
-      <section className="rounded-lg border border-white/8 bg-white/[0.035] p-4 text-xs leading-5 text-studio-muted">
+      <section className="rounded-lg border border-slate-200 bg-white p-4 text-xs leading-5 text-slate-500 shadow-sm">
         Actions are mainly for buttons and CTA buttons in this MVP.
       </section>
     );
   }
 
   return (
-    <section className="rounded-lg border border-white/8 bg-white/[0.035] p-4">
-      <h3 className="text-sm font-black text-white">Action</h3>
+    <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="text-sm font-black text-slate-950">Action</h3>
       <div className="mt-3 space-y-3">
         <label className="block">
           <span className="studio-label">Click action</span>
@@ -80,7 +80,7 @@ export function ActionPanel({ object }: { object: EditorObject }) {
         ) : null}
 
         {object.type === "ctaButton" ? (
-          <div className="rounded-lg border border-amber-300/18 bg-amber-300/8 p-3 text-xs leading-5 text-amber-100">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-800">
             Real ad networks may require MRAID or network-specific CTA handling.
           </div>
         ) : null}

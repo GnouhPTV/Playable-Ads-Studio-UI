@@ -18,16 +18,17 @@ export function TemplateCard({ template }: { template: TemplateDefinition }) {
   return (
     <motion.article
       variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
-      className="studio-panel flex min-h-[470px] flex-col overflow-hidden rounded-lg"
+      className="studio-panel flex min-h-[470px] flex-col overflow-hidden rounded-lg transition hover:-translate-y-1 hover:shadow-[0_22px_54px_rgba(15,23,42,0.12)]"
     >
-      <div className={`relative h-52 bg-gradient-to-br ${template.thumbnailClass}`}>
+      <div className={`relative h-52 overflow-hidden bg-gradient-to-br ${template.thumbnailClass}`}>
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-white/35" />
         <div className="absolute inset-0 grid place-items-center">
           <TemplateThumbnail templateId={template.id} />
         </div>
         <div className="absolute left-4 top-4 rounded-md border border-white/80 bg-white/80 px-3 py-1 text-xs font-bold text-slate-700 backdrop-blur">
           {template.difficulty}
         </div>
-        <div className="absolute right-4 top-4 rounded-md border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700">
+        <div className="absolute right-4 top-4 rounded-md border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
           {template.category}
         </div>
       </div>
@@ -37,9 +38,11 @@ export function TemplateCard({ template }: { template: TemplateDefinition }) {
           <div>
             <h2 className="text-xl font-black text-slate-950">{template.name}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{template.description}</p>
-            <p className="mt-3 text-xs font-bold uppercase text-sky-700">{template.mainMechanic}</p>
+            <p className="mt-3 text-xs font-bold uppercase text-blue-700">{template.mainMechanic}</p>
           </div>
-          <Gamepad2 className="mt-1 size-5 shrink-0 text-studio-cyan" aria-hidden />
+          <span className="grid size-9 shrink-0 place-items-center rounded-md bg-blue-50 text-blue-600">
+            <Gamepad2 className="size-5" aria-hidden />
+          </span>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -53,7 +56,7 @@ export function TemplateCard({ template }: { template: TemplateDefinition }) {
         <div className="mt-auto grid grid-cols-2 gap-2 pt-5">
           <button
             type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
           >
             <Eye className="size-4" aria-hidden />
             Preview
@@ -61,7 +64,7 @@ export function TemplateCard({ template }: { template: TemplateDefinition }) {
           <button
             type="button"
             onClick={useTemplate}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-sky-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-sky-700"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700"
           >
             Use Template
             <ArrowRight className="size-4" aria-hidden />
@@ -89,7 +92,7 @@ function TemplateThumbnail({ templateId }: { templateId: TemplateDefinition["id"
           -5
         </div>
         <div className="absolute bottom-7 left-[94px] size-9 rounded-full bg-cyan-300 shadow-glow" />
-        <div className="absolute bottom-3 left-[84px] text-[10px] font-black uppercase tracking-normal text-white/70">
+        <div className="absolute bottom-3 left-[84px] text-[10px] font-black uppercase tracking-normal text-slate-400">
           drag lanes
         </div>
         <div className="absolute bottom-14 right-8 size-3 rounded-full bg-lime-300" />
@@ -131,7 +134,7 @@ function TemplateThumbnail({ templateId }: { templateId: TemplateDefinition["id"
       </div>
       <div className="absolute right-7 top-8 size-10 rounded-full bg-rose-300" />
       <div className="absolute right-14 top-[72px] h-1.5 w-20 rotate-[-18deg] rounded bg-lime-300 shadow-glow" />
-      <div className="absolute left-5 top-5 rounded-md border border-white/10 bg-white/8 px-2 py-1 text-[10px] font-black text-white">
+        <div className="absolute left-5 top-5 rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-black text-slate-700 shadow-sm">
         auto shoot
       </div>
     </div>

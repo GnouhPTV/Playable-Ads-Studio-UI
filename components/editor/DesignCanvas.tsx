@@ -368,7 +368,7 @@ export function DesignCanvas() {
           <button
             type="button"
             onClick={() => setEditorMode(editorMode === "design" ? "preview" : "design")}
-            className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-bold ${
+            className={`inline-flex min-h-9 items-center gap-2 rounded-md border px-3 text-xs font-bold ${
               editorMode === "preview"
                 ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                 : "border-slate-200 bg-white text-slate-700"
@@ -380,8 +380,8 @@ export function DesignCanvas() {
           <button
             type="button"
             onClick={() => setShowGrid((value) => !value)}
-            className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-bold ${
-              showGrid ? "border-sky-200 bg-sky-50 text-sky-700" : "border-slate-200 bg-white text-slate-600"
+            className={`inline-flex min-h-9 items-center gap-2 rounded-md border px-3 text-xs font-bold ${
+              showGrid ? "border-blue-200 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600"
             }`}
           >
             <Grid3X3 className="size-4" aria-hidden />
@@ -390,8 +390,8 @@ export function DesignCanvas() {
           <button
             type="button"
             onClick={() => setShowSafeArea((value) => !value)}
-            className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-bold ${
-              showSafeArea ? "border-sky-200 bg-sky-50 text-sky-700" : "border-slate-200 bg-white text-slate-600"
+            className={`inline-flex min-h-9 items-center gap-2 rounded-md border px-3 text-xs font-bold ${
+              showSafeArea ? "border-blue-200 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600"
             }`}
           >
             <Ruler className="size-4" aria-hidden />
@@ -402,8 +402,8 @@ export function DesignCanvas() {
               key={value}
               type="button"
               onClick={() => setZoom(value)}
-              className={`rounded-md border px-3 py-2 text-xs font-bold ${
-                zoom === value ? "border-sky-200 bg-sky-50 text-sky-700" : "border-slate-200 bg-white text-slate-600"
+              className={`min-h-9 rounded-md border px-3 text-xs font-bold ${
+                zoom === value ? "border-blue-200 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600"
               }`}
             >
               {Math.round(value * 100)}%
@@ -421,7 +421,7 @@ export function DesignCanvas() {
       </div>
 
       <div
-        className="scrollbar-soft flex flex-1 items-start justify-center overflow-auto bg-slate-100/70 p-6"
+        className="scrollbar-soft flex flex-1 items-start justify-center overflow-auto bg-[#eef3f8] p-6"
         onDragOver={(event) => event.preventDefault()}
         onDrop={(event) => {
           event.preventDefault();
@@ -435,12 +435,12 @@ export function DesignCanvas() {
         }}
       >
         <div
-          className="relative rounded-[38px] border border-slate-200 bg-gradient-to-b from-white to-slate-100 p-3 shadow-panel"
+          className="relative rounded-[38px] border border-slate-300 bg-gradient-to-b from-white to-slate-100 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.16)]"
           style={{ width: CANVAS_WIDTH * zoom + 24, height: CANVAS_HEIGHT * zoom + 84 }}
         >
           <div
             ref={canvasRef}
-            className="relative h-[640px] w-[360px] origin-top-left overflow-hidden rounded-[28px] border border-slate-200 bg-black"
+            className="relative h-[640px] w-[360px] origin-top-left overflow-hidden rounded-[28px] border border-slate-300 bg-black shadow-inner"
             style={{
               transform: `scale(${zoom})`,
               background: scene.backgroundColor
@@ -451,9 +451,9 @@ export function DesignCanvas() {
               }
             }}
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-[5000] flex h-9 items-center justify-between bg-black/25 px-5 text-[10px] font-black text-white/78 backdrop-blur-sm">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-[5000] flex h-9 items-center justify-between bg-slate-950/45 px-5 text-[10px] font-black text-white/85 backdrop-blur-sm">
               <span>9:41</span>
-              <span className="absolute left-1/2 top-2.5 h-4 w-24 -translate-x-1/2 rounded-full bg-black/82" />
+              <span className="absolute left-1/2 top-2.5 h-4 w-24 -translate-x-1/2 rounded-full bg-black/80 shadow-sm" />
               <span className="inline-flex items-center gap-1">
                 <ZoomIn className="size-3" aria-hidden />
               {Math.round(zoom * 100)}%

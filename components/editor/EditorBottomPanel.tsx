@@ -34,7 +34,7 @@ export function EditorBottomPanel({ project, onShowOnboarding }: EditorBottomPan
             type="button"
             onClick={() => setTab(id)}
             className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold transition ${
-              tab === id ? "bg-sky-50 text-sky-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              tab === id ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
             }`}
           >
             <Icon className="size-4" aria-hidden />

@@ -3,7 +3,7 @@
 export type ResizeHandlePosition = "nw" | "ne" | "sw" | "se";
 
 const handleClass =
-  "absolute size-3 rounded-full border border-zinc-950 bg-studio-cyan shadow-glow";
+  "absolute size-3 rounded-full border border-white bg-blue-600 shadow-[0_0_0_3px_rgba(37,99,235,0.18)]";
 
 export function ResizeHandles({
   onResizeStart

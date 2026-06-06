@@ -45,31 +45,39 @@ export function ExportModal({ project, open, onClose }: ExportModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4 backdrop-blur-sm">
-      <section className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black text-slate-950">Export Playable Package</h2>
+      <section className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg border border-slate-200 bg-white shadow-panel">
+        <div className="border-b border-slate-200 bg-slate-50 p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-600 text-white shadow-[0_12px_24px_rgba(37,99,235,0.18)]">
+                <Download className="size-5" aria-hidden />
+              </span>
+              <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-black text-slate-950">Export Playable Package</h2>
               <Tooltip
                 label="Export"
                 text="Export downloads a ZIP that can run locally. It is a learning package, not a production ad-network upload."
               />
+              </div>
+              <p className="mt-1 text-sm text-slate-500">
+                Validation runs before the ZIP is generated.
+              </p>
+              </div>
             </div>
-            <p className="mt-1 text-sm text-slate-500">
-              Validation runs before the ZIP is generated.
-            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 hover:text-slate-900"
+              title="Close"
+            >
+              <X className="size-4" aria-hidden />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 hover:text-slate-900"
-            title="Close"
-          >
-            <X className="size-4" aria-hidden />
-          </button>
         </div>
 
-        <div className="mb-5 rounded-md border border-slate-200 bg-slate-50 p-4">
+        <div className="p-5">
+        <div className="mb-5 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-black text-slate-950">Pre-export Checklist</h3>
@@ -87,7 +95,7 @@ export function ExportModal({ project, open, onClose }: ExportModalProps) {
           </div>
         </div>
 
-        <div className="mb-5 grid gap-3 rounded-md border border-sky-200 bg-sky-50 p-4 text-sm text-sky-800 md:grid-cols-3">
+        <div className="mb-5 grid gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 md:grid-cols-3">
           <div><strong>Network:</strong> {project.settings.networkPreset ?? "generic"}</div>
           <div><strong>Duration:</strong> {project.settings.duration}s</div>
           <div><strong>CTA:</strong> {project.settings.ctaText}</div>
@@ -100,7 +108,7 @@ export function ExportModal({ project, open, onClose }: ExportModalProps) {
           ))}
         </div>
 
-        <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
+        <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
           This MVP export is for learning and local testing. Real ad network deployment may require
           additional MRAID, network-specific specifications, file size limits, orientation settings,
           and QA validation.
@@ -120,11 +128,12 @@ export function ExportModal({ project, open, onClose }: ExportModalProps) {
             type="button"
             onClick={handleExport}
             disabled={blocked || isExporting}
-            className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-4 py-3 text-sm font-extrabold text-white disabled:bg-slate-300"
+            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700 disabled:bg-slate-300"
           >
             {isExporting ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Download className="size-4" aria-hidden />}
             Download ZIP
           </button>
+        </div>
         </div>
       </section>
     </div>

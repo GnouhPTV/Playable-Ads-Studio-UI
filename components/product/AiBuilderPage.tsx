@@ -36,7 +36,7 @@ export function AiBuilderPage() {
   return (
     <div className="space-y-6">
       <section className="studio-panel rounded-lg p-6">
-        <p className="mb-2 text-sm font-bold text-sky-700">Local Mock Generator</p>
+        <p className="mb-2 text-sm font-bold text-blue-700">Local Mock Generator</p>
         <h1 className="text-3xl font-black text-slate-950">AI Playable Builder</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
           Structured MVP for future AI generation. It creates mock playable specs locally, with no backend calls.
@@ -67,7 +67,7 @@ export function AiBuilderPage() {
 
         <section className="studio-panel rounded-lg p-5">
           <div className="mb-4 flex items-center gap-2">
-            <Bot className="size-5 text-sky-600" aria-hidden />
+            <Bot className="size-5 text-blue-600" aria-hidden />
             <h2 className="text-lg font-black text-slate-950">Mock Structured Output</h2>
           </div>
           <pre className="overflow-auto rounded-md border border-slate-200 bg-slate-950 p-4 text-xs leading-6 text-sky-100">
@@ -94,7 +94,7 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
 
 function Action({ label }: { label: string }) {
   return (
-    <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-sky-600 px-3 text-xs font-black text-white">
+    <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-xs font-black text-white transition hover:bg-blue-700">
       <Wand2 className="size-4" aria-hidden />
       {label}
     </button>

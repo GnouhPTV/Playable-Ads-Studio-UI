@@ -47,11 +47,11 @@ export function InteractionPanel({ project }: { project: PlayableProject }) {
   const setMechanic = useEditorStore((state) => state.setMechanic);
 
   return (
-    <section className="rounded-lg border border-white/8 bg-white/[0.035] p-4">
+    <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-black text-white">Interaction Editor</h3>
-          <p className="mt-1 text-xs text-studio-muted">Choose one primary mechanic for the MVP export.</p>
+          <h3 className="text-sm font-black text-slate-950">Interaction Editor</h3>
+          <p className="mt-1 text-xs text-slate-500">Choose one primary mechanic for the MVP export.</p>
         </div>
         <Tooltip
           label="Mechanic"
@@ -71,17 +71,17 @@ export function InteractionPanel({ project }: { project: PlayableProject }) {
               onClick={() => setMechanic(option.id)}
               className={`w-full rounded-lg border p-3 text-left transition ${
                 active
-                  ? "border-cyan-300/35 bg-cyan-300/12"
-                  : "border-white/8 bg-black/16 hover:border-white/18"
+                  ? "border-blue-200 bg-blue-50"
+                  : "border-slate-200 bg-white hover:border-blue-200"
               }`}
             >
               <span className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/8 text-studio-cyan">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-600">
                   <Icon className="size-4" aria-hidden />
                 </span>
                 <span>
-                  <span className="block text-sm font-extrabold text-white">{option.label}</span>
-                  <span className="mt-1 block text-xs leading-5 text-studio-muted">{option.description}</span>
+                  <span className="block text-sm font-extrabold text-slate-950">{option.label}</span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-500">{option.description}</span>
                 </span>
               </span>
             </button>

@@ -190,8 +190,13 @@ export function ObjectLibrary() {
   }
 
   return (
-    <aside className="studio-panel scrollbar-soft h-full overflow-auto rounded-lg p-3">
-      <div className="mb-3 grid grid-cols-3 gap-1">
+    <aside className="studio-panel scrollbar-soft h-full overflow-auto rounded-lg p-4">
+      <div className="mb-4">
+        <h2 className="text-sm font-black text-slate-950">Builder Library</h2>
+        <p className="mt-1 text-xs leading-5 text-slate-500">Add objects, scenes, assets, logic, and export settings.</p>
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-2">
         <TabButton tab="objects" activeTab={tab} onClick={setTab} icon={Box} label="Objects" />
         <TabButton tab="assets" activeTab={tab} onClick={setTab} icon={FileImage} label="Assets" />
         <TabButton tab="scenes" activeTab={tab} onClick={setTab} icon={Layers3} label="Scenes" />
@@ -218,9 +223,9 @@ export function ObjectLibrary() {
                   key={item.type}
                   type="button"
                   onClick={() => addObject(item.type)}
-                  className="flex items-center gap-3 rounded-md border border-slate-200 bg-white p-3 text-left text-sm font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50"
+                  className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-left text-sm font-bold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50"
                 >
-                  <span className="grid size-9 place-items-center rounded-md bg-sky-50 text-sky-600">
+                  <span className="grid size-9 place-items-center rounded-md bg-blue-50 text-blue-600">
                     <Icon className="size-4" aria-hidden />
                   </span>
                   {item.label}
@@ -255,9 +260,9 @@ export function ObjectLibrary() {
                 key={String(id)}
                 type="button"
                 onClick={() => (id === "cta" ? addObject("ctaButton") : addTemplate(String(id)))}
-                className="flex items-center gap-3 rounded-md border border-slate-200 bg-white p-3 text-left text-xs font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50"
+                className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-left text-xs font-bold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50"
               >
-                <span className="grid size-8 place-items-center rounded-md bg-sky-50 text-sky-600">
+                <span className="grid size-8 place-items-center rounded-md bg-blue-50 text-blue-600">
                   <Icon className="size-4" aria-hidden />
                 </span>
                 {String(label)}
@@ -284,12 +289,12 @@ export function ObjectLibrary() {
                   key={item.value}
                   type="button"
                   onClick={() => setMechanic(item.value)}
-                  className={`rounded-md border p-3 text-left transition ${
-                    active ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white hover:border-sky-200"
+                  className={`rounded-lg border p-3 text-left transition ${
+                    active ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:border-blue-200"
                   }`}
                 >
                   <span className="flex items-center gap-2 text-sm font-black text-slate-900">
-                    <Icon className="size-4 text-sky-600" aria-hidden />
+                    <Icon className="size-4 text-blue-600" aria-hidden />
                     {item.label}
                   </span>
                   <span className="mt-1 block text-xs leading-5 text-slate-500">{item.description}</span>
@@ -420,13 +425,14 @@ function TabButton({
       type="button"
       onClick={() => onClick(tab)}
       title={label}
-      className={`grid h-10 place-items-center rounded-lg border transition ${
+      className={`flex min-h-12 items-center gap-2 rounded-lg border px-3 text-left transition ${
         active
-          ? "border-sky-200 bg-sky-50 text-sky-700"
-          : "border-slate-200 bg-white text-slate-500 hover:text-slate-900"
+          ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
+          : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-slate-950"
       }`}
     >
       <Icon className="size-4" aria-hidden />
+      <span className="truncate text-xs font-bold">{label}</span>
     </button>
   );
 }

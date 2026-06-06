@@ -86,9 +86,9 @@ export function LearningNotesPanel({
       <button
         type="button"
         onClick={onShowOnboarding}
-        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/6 px-3 py-2 text-sm font-bold text-white transition hover:border-white/18"
+        className="mt-4 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700 transition hover:border-blue-300"
       >
-        <Lightbulb className="size-4 text-studio-cyan" aria-hidden />
+        <Lightbulb className="size-4" aria-hidden />
         Show Guided Onboarding
       </button>
     </section>
@@ -107,7 +107,7 @@ function NoteCard({
   return (
     <article className="rounded-md border border-slate-200 bg-slate-50 p-3">
       <div className="mb-3 flex items-center gap-2 text-sm font-extrabold text-slate-950">
-        <Icon className="size-4 text-studio-cyan" aria-hidden />
+        <Icon className="size-4 text-blue-600" aria-hidden />
         {title}
       </div>
       <ul className="space-y-2 text-xs leading-5 text-slate-600">

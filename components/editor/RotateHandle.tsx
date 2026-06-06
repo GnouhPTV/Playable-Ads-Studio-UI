@@ -11,7 +11,7 @@ export function RotateHandle({
     <button
       type="button"
       onPointerDown={onRotateStart}
-      className="absolute left-1/2 top-[-42px] grid size-8 -translate-x-1/2 cursor-grab place-items-center rounded-full border border-cyan-300/40 bg-zinc-950 text-studio-cyan shadow-glow"
+      className="absolute left-1/2 top-[-42px] grid size-8 -translate-x-1/2 cursor-grab place-items-center rounded-full border border-blue-200 bg-white text-blue-600 shadow-panel"
       aria-label="Rotate object"
     >
       <RotateCw className="size-4" aria-hidden />

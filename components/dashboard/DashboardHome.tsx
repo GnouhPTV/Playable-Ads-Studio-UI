@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Bot,
+  CheckCircle2,
   Clapperboard,
   FilePlus2,
   FolderOpen,
@@ -35,6 +36,11 @@ export function DashboardHome() {
     [projects, query]
   );
   const featuredTemplates = templateDefinitions.slice(0, 3);
+  const stats = [
+    { label: "Local projects", value: projects.length || 0 },
+    { label: "Templates", value: templateDefinitions.length },
+    { label: "Export target", value: "HTML5" }
+  ];
 
   function createBlankProject() {
     const project = createProjectFromTemplate("intro-cta");
@@ -47,27 +53,46 @@ export function DashboardHome() {
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="studio-panel overflow-hidden rounded-lg p-6 sm:p-8"
+        className="studio-panel overflow-hidden rounded-lg p-5 sm:p-6"
       >
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-700">
+        <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-center">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700">
               <Sparkles className="size-4" aria-hidden />
-              Local no-code playable ads builder
+              Portfolio-ready playable builder
             </div>
-            <h1 className="text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">
-              Playable Ads Studio
+            <h1 className="max-w-3xl text-3xl font-black tracking-normal text-slate-950 sm:text-4xl">
+              Build, preview, validate, and export playable ads from one clean workspace.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-              Build interactive playable ads without coding. Create scenes, add assets, preview,
-              validate, and export a local HTML5 package from one bright workspace.
+            <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
+              A focused local studio for learning playable ad workflows: template selection,
+              scene editing, phone preview, validation, and ZIP export.
             </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              {stats.map((stat) => (
+                <div key={stat.label} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="text-xl font-black text-slate-950">{stat.value}</div>
+                  <div className="mt-1 text-xs font-bold uppercase text-slate-500">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid min-w-[260px] gap-3">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="mb-4 flex items-start gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-md bg-emerald-100 text-emerald-700">
+                <CheckCircle2 className="size-5" aria-hidden />
+              </span>
+              <div>
+                <h2 className="text-sm font-black text-slate-950">Recommended next step</h2>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  Start from a template, then tune objects, scenes, validation, and export notes.
+                </p>
+              </div>
+            </div>
             <Link
               href="/templates"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-sky-600 px-4 py-3 text-sm font-extrabold text-white shadow-glow transition hover:bg-sky-700"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-extrabold text-white shadow-[0_12px_24px_rgba(37,99,235,0.18)] transition hover:bg-blue-700"
             >
               <Plus className="size-4" aria-hidden />
               Create New Playable
@@ -76,7 +101,7 @@ export function DashboardHome() {
               type="button"
               onClick={() => latestProject && router.push(`/editor/${latestProject.id}`)}
               disabled={!latestProject}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
             >
               <FolderOpen className="size-4" aria-hidden />
               Open Last Edited
@@ -105,6 +130,7 @@ export function DashboardHome() {
         <aside className="space-y-4">
           <section className="studio-panel rounded-lg p-5">
             <h2 className="text-lg font-black text-slate-950">Quick Actions</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-500">High-frequency tools for building and studying playable ads.</p>
             <div className="mt-4 grid gap-2">
               <ActionLink href="/templates" icon={<LayoutTemplate className="size-4" />} title="New from Template" text="Start with a proven mechanic." />
               <ActionButton icon={<FilePlus2 className="size-4" />} title="New Blank Project" text="Create a simple editable flow." onClick={createBlankProject} />
@@ -120,7 +146,7 @@ export function DashboardHome() {
                 <Link
                   key={template.id}
                   href="/templates"
-                  className="block rounded-md border border-slate-200 bg-slate-50 p-3 transition hover:border-sky-200 hover:bg-sky-50"
+                  className="block rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50"
                 >
                   <div className="text-sm font-black text-slate-900">{template.name}</div>
                   <div className="mt-1 text-xs text-slate-500">{template.mainMechanic} - {template.difficulty}</div>
@@ -136,8 +162,8 @@ export function DashboardHome() {
 
 function ActionLink({ href, icon, title, text }: { href: string; icon: React.ReactNode; title: string; text: string }) {
   return (
-    <Link href={href} className="flex items-center gap-3 rounded-md border border-slate-200 bg-white p-3 transition hover:border-sky-200 hover:bg-sky-50">
-      <span className="grid size-10 place-items-center rounded-md bg-sky-100 text-sky-700">{icon}</span>
+    <Link href={href} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50">
+      <span className="grid size-10 place-items-center rounded-md bg-blue-100 text-blue-700">{icon}</span>
       <span>
         <span className="block text-sm font-black text-slate-900">{title}</span>
         <span className="block text-xs text-slate-500">{text}</span>
@@ -148,7 +174,7 @@ function ActionLink({ href, icon, title, text }: { href: string; icon: React.Rea
 
 function ActionButton({ icon, title, text, onClick }: { icon: React.ReactNode; title: string; text: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="flex items-center gap-3 rounded-md border border-slate-200 bg-white p-3 text-left transition hover:border-sky-200 hover:bg-sky-50">
+    <button type="button" onClick={onClick} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50">
       <span className="grid size-10 place-items-center rounded-md bg-emerald-100 text-emerald-700">{icon}</span>
       <span>
         <span className="block text-sm font-black text-slate-900">{title}</span>

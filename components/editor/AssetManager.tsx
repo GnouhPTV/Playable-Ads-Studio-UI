@@ -172,8 +172,8 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
               onDragStart={(event) => {
                 event.dataTransfer.setData("application/playable-asset-id", asset.id);
               }}
-              className="rounded-md border border-slate-200 bg-white p-3 shadow-sm"
-            >
+            className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-panel"
+          >
               <div className="flex gap-3">
                 <AssetThumb asset={asset} />
                 <div className="min-w-0 flex-1">
@@ -194,7 +194,7 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
                 <button
                   type="button"
                   onClick={() => addAssetToCanvas(asset)}
-                  className="rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-bold text-sky-700"
+                  className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700"
                 >
                   Add to Canvas
                 </button>
@@ -202,7 +202,7 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
                   type="button"
                   disabled={!selectedObject}
                   onClick={() => assignToSelected(asset, selectedObject)}
-                  className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 disabled:opacity-40"
+                  className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700 disabled:opacity-40"
                 >
                   Assign Selected
                 </button>
@@ -237,8 +237,8 @@ function UploadButton({
   helper?: string;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 rounded-md border border-slate-200 bg-white p-3 text-sm font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50">
-      <span className="grid size-9 place-items-center rounded-md bg-sky-50 text-sky-600">
+    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-sm font-bold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50">
+      <span className="grid size-9 place-items-center rounded-md bg-blue-50 text-blue-600">
         <Icon className="size-4" aria-hidden />
       </span>
       <span>
@@ -254,7 +254,7 @@ function UploadButton({
 function AssetThumb({ asset }: { asset: PlayableAsset }) {
   if (asset.type === "audio") {
     return (
-      <div className="grid size-14 shrink-0 place-items-center rounded-md border border-sky-200 bg-sky-50 text-sky-600">
+      <div className="grid size-14 shrink-0 place-items-center rounded-md border border-blue-200 bg-blue-50 text-blue-600">
         <Music2 className="size-5" aria-hidden />
       </div>
     );

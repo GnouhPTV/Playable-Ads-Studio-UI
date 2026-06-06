@@ -37,9 +37,12 @@ export function TemplateLibrary() {
 
   return (
     <div className="space-y-6">
-      <section className="studio-panel rounded-lg p-6">
+      <section className="studio-panel rounded-lg p-5 sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
+            <div className="mb-3 inline-flex rounded-md border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-black uppercase text-blue-700">
+              Starter mechanics
+            </div>
             <h1 className="text-3xl font-black tracking-normal text-slate-950">Template Gallery</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
               Start with a mechanic, then customize scenes, assets, interactions, validation, and export settings in the builder.
@@ -56,7 +59,7 @@ export function TemplateLibrary() {
           </label>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-3">
           <Filter label="Category" value={category} onChange={(value) => setCategory(value as typeof category)} options={categories} />
           <Filter label="Difficulty" value={difficulty} onChange={(value) => setDifficulty(value as typeof difficulty)} options={difficulties} />
           <Filter label="Sort by" value={sort} onChange={(value) => setSort(value as typeof sort)} options={sorts} />

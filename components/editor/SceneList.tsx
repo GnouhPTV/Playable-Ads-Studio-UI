@@ -24,8 +24,8 @@ export function SceneList({
     <div>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-black uppercase tracking-normal text-white">Project Scenes</h2>
-          <p className="mt-1 text-xs leading-5 text-studio-muted">Intro, gameplay, and end card flow.</p>
+          <h2 className="text-sm font-black uppercase tracking-normal text-slate-950">Project Scenes</h2>
+          <p className="mt-1 text-xs leading-5 text-slate-500">Intro, gameplay, and end card flow.</p>
         </div>
         <Tooltip
           label="Scene"
@@ -45,19 +45,19 @@ export function SceneList({
               onClick={() => setSelectedScene(scene.id)}
               className={`w-full rounded-lg border p-3 text-left transition ${
                 active
-                  ? "border-cyan-300/35 bg-cyan-300/12"
-                  : "border-white/8 bg-white/[0.04] hover:border-white/18"
+                  ? "border-blue-200 bg-blue-50 shadow-sm"
+                  : "border-slate-200 bg-white hover:border-blue-200"
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/8 text-studio-cyan">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-600">
                   <Icon className="size-4" aria-hidden />
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-extrabold text-white">
+                  <span className="block truncate text-sm font-extrabold text-slate-950">
                     {index + 1}. {scene.title}
                   </span>
-                  <span className="block text-xs text-studio-muted">
+                  <span className="block text-xs text-slate-500">
                     {scene.duration}s - {scene.type}
                   </span>
                 </span>
@@ -67,7 +67,7 @@ export function SceneList({
         })}
       </div>
 
-      <div className="mt-5 rounded-lg border border-amber-300/18 bg-amber-300/8 p-3 text-xs leading-5 text-amber-100">
+      <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-800">
         MVP export is for learning and local testing. Real network deployment needs extra specs and QA.
       </div>
     </div>

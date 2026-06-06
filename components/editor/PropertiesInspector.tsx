@@ -34,7 +34,7 @@ export function PropertiesInspector({ project }: { project: PlayableProject }) {
 
   return (
     <aside className="studio-panel scrollbar-soft max-h-[calc(100vh-97px)] overflow-auto rounded-lg p-4">
-      <div className="mb-5 flex items-start justify-between gap-3">
+      <div className="mb-5 flex items-start justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
         <div>
           <h2 className="text-sm font-black uppercase tracking-normal text-slate-950">
             {object ? "Object Properties" : "Scene Properties"}
@@ -47,7 +47,7 @@ export function PropertiesInspector({ project }: { project: PlayableProject }) {
       </div>
 
       {!object ? (
-        <section className="space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+        <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <TextField label="Scene name" value={scene.title} onChange={(value) => updateScene(scene.id, { title: value })} />
           <ColorField label="Background color" value={scene.backgroundColor} onChange={(value) => updateScene(scene.id, { backgroundColor: value })} />
           <SelectField
@@ -71,7 +71,7 @@ export function PropertiesInspector({ project }: { project: PlayableProject }) {
         </section>
       ) : (
         <div className="space-y-4">
-          <section className="space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+          <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
             <TextField label="Layer name" value={object.name} onChange={(value) => updateObject(object.id, { name: value })} />
             <div className="grid grid-cols-2 gap-3">
               <NumberField label="X" value={object.x} onChange={(value) => updateObject(object.id, { x: value })} />
@@ -243,7 +243,7 @@ function TypeSpecificFields({
 
 function Section({ title, children }: Readonly<{ title: string; children: React.ReactNode }>) {
   return (
-    <section className="space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+    <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
       <h3 className="text-sm font-black text-slate-950">{title}</h3>
       {children}
     </section>
