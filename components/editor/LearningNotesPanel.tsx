@@ -37,6 +37,15 @@ const templateLessons = {
   ]
 } satisfies Record<PlayableProject["templateId"], string[]>;
 
+const templateSceneFiles = {
+  "gem-collector": "GemCollectorScene",
+  "intro-cta": "CtaFlowScene",
+  "merge-cannon": "MergeCannonScene",
+  "runner-gate": "RunnerGateScene",
+  "simple-end-card": "CtaFlowScene",
+  "tap-monster": "TapMonsterScene"
+} satisfies Record<PlayableProject["templateId"], string>;
+
 export function LearningNotesPanel({
   project,
   onShowOnboarding,
@@ -78,7 +87,7 @@ export function LearningNotesPanel({
           items={[
             "store/editorStore.ts",
             "components/game/PhaserPreview.tsx",
-            `lib/game/scenes/${project.templateId === "merge-cannon" ? "MergeCannonScene" : project.templateId === "runner-gate" ? "RunnerGateScene" : "TapMonsterScene"}.ts`
+            `lib/game/scenes/${templateSceneFiles[project.templateId]}.ts`
           ]}
         />
       </div>

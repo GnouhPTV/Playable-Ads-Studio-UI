@@ -108,7 +108,7 @@ body { display: grid; place-items: center; overflow: hidden; }
 .mechanic-layer {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 40;
   pointer-events: auto;
 }
 .hud {
@@ -119,7 +119,7 @@ body { display: grid; place-items: center; overflow: hidden; }
   font-size: 14px;
   font-weight: 900;
 }
-.tap-target, .runner-player, .cannon {
+.tap-target, .runner-player, .cannon, .gem {
   position: absolute;
   display: grid;
   place-items: center;
@@ -138,6 +138,59 @@ body { display: grid; place-items: center; overflow: hidden; }
   border-radius: 8px;
   font-weight: 900;
   color: #071014;
+}
+.gem {
+  border-radius: 8px;
+  transform: rotate(45deg);
+}
+.gem span {
+  transform: rotate(-45deg);
+}
+.flow-card {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 168px;
+  min-height: 300px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 18px;
+  background: rgba(9,9,11,0.72);
+  color: white;
+  text-align: center;
+}
+.flow-card h2 {
+  margin: 0 0 14px;
+  font-size: 26px;
+  line-height: 1.05;
+}
+.flow-card p {
+  margin: 0 0 18px;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.flow-card button {
+  min-width: 210px;
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--main);
+  color: #071014;
+  font-weight: 900;
+}
+.feedback {
+  position: absolute;
+  left: 50%;
+  bottom: 72px;
+  z-index: 20;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(15,23,42,0.86);
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 900;
 }
 .animate-fadeIn { animation: fade-in 420ms ease both; }
 .animate-popIn { animation: pop-in 360ms cubic-bezier(0.2, 1.3, 0.35, 1) both; }
@@ -372,6 +425,28 @@ function renderTemplateGameplay(scene) {
   hud.textContent = "Score " + score;
   layer.appendChild(hud);
 
+  function updateScore(nextScore) {
+    score = Math.max(0, nextScore);
+    hud.textContent = "Score " + score;
+  }
+
+  function showFeedback(text) {
+    const old = layer.querySelector(".feedback");
+    if (old) old.remove();
+    const feedback = document.createElement("div");
+    feedback.className = "feedback";
+    feedback.textContent = text;
+    layer.appendChild(feedback);
+    window.setTimeout(() => feedback.remove(), 900);
+  }
+
+  function centerOf(el) {
+    return {
+      x: Number.parseFloat(el.style.left || "0") + Number.parseFloat(el.style.width || "0") / 2,
+      y: Number.parseFloat(el.style.top || "0") + Number.parseFloat(el.style.height || "0") / 2
+    };
+  }
+
   if (PROJECT.templateId === "tap-monster") {
     const target = document.createElement("button");
     target.className = "tap-target";
@@ -381,12 +456,39 @@ function renderTemplateGameplay(scene) {
     target.style.width = "100px";
     target.style.height = "100px";
     target.addEventListener("click", () => {
-      score += 1;
-      hud.textContent = "Score " + score;
+      updateScore(score + 1);
       target.style.left = 40 + Math.random() * 220 + "px";
       target.style.top = 140 + Math.random() * 330 + "px";
+      showFeedback("+1 tap");
     });
     layer.appendChild(target);
+  }
+
+  if (PROJECT.templateId === "gem-collector") {
+    function spawnGem(index) {
+      const gem = document.createElement("button");
+      const value = index % 3 === 0 ? 10 : 5;
+      gem.className = "gem";
+      gem.style.left = 42 + Math.random() * 250 + "px";
+      gem.style.top = 150 + Math.random() * 330 + "px";
+      gem.style.width = "34px";
+      gem.style.height = "34px";
+      gem.style.background = index % 3 === 0 ? PROJECT.settings.accentColor : PROJECT.settings.mainColor;
+      const label = document.createElement("span");
+      label.textContent = "+" + value;
+      gem.appendChild(label);
+      gem.addEventListener("click", () => {
+        updateScore(score + value);
+        showFeedback("+" + value + " gems");
+        gem.remove();
+        spawnGem(index + 1);
+      });
+      layer.appendChild(gem);
+    }
+
+    for (let index = 0; index < 6; index += 1) {
+      spawnGem(index);
+    }
   }
 
   if (PROJECT.templateId === "runner-gate") {
@@ -397,40 +499,139 @@ function renderTemplateGameplay(scene) {
     player.style.width = "50px";
     player.style.height = "50px";
     player.textContent = "RUN";
+    const gates = [];
+
+    function applyGate(gate, label) {
+      if (!gates.includes(gate)) return;
+      if (label === "+10") updateScore(score + 10);
+      if (label === "x2") updateScore(Math.max(2, score * 2));
+      if (label === "-5") updateScore(score - 5);
+      gates.splice(gates.indexOf(gate), 1);
+      gate.remove();
+      showFeedback(label + " gate");
+    }
+
+    function checkRunnerCollisions() {
+      const playerCenter = centerOf(player);
+      gates.slice().forEach((gate) => {
+        const gateCenter = centerOf(gate);
+        if (Math.abs(gateCenter.x - playerCenter.x) < 50 && Math.abs(gateCenter.y - playerCenter.y) < 92) {
+          applyGate(gate, gate.textContent);
+        }
+      });
+    }
+
     layer.addEventListener("pointermove", (event) => {
       if (!event.buttons) return;
       const rect = root.getBoundingClientRect();
       const x = Math.max(24, Math.min(310, event.clientX - rect.left - 25));
       player.style.left = x + "px";
+      checkRunnerCollisions();
     });
     ["+10", "x2", "-5"].forEach((label, index) => {
       const gate = document.createElement("div");
       gate.className = "gate";
       gate.textContent = label;
       gate.style.left = 40 + index * 105 + "px";
-      gate.style.top = "220px";
+      gate.style.top = "420px";
       gate.style.background = label.startsWith("-") ? "#fb7185" : PROJECT.settings.accentColor;
+      gate.addEventListener("click", () => applyGate(gate, label));
+      gates.push(gate);
       layer.appendChild(gate);
     });
     layer.appendChild(player);
   }
 
   if (PROJECT.templateId === "merge-cannon") {
+    let active = null;
+    const cannons = [];
+
+    function updateCannonLabel(cannon) {
+      cannon.textContent = "L" + cannon.dataset.level;
+      const size = 52 + Number(cannon.dataset.level) * 6;
+      cannon.style.width = size + "px";
+      cannon.style.height = size + "px";
+    }
+
+    function mergeIfPossible(source) {
+      const sourceCenter = centerOf(source);
+      const sourceLevel = source.dataset.level;
+      const target = cannons.find((cannon) => {
+        if (cannon === source || cannon.dataset.level !== sourceLevel) return false;
+        const targetCenter = centerOf(cannon);
+        return Math.hypot(targetCenter.x - sourceCenter.x, targetCenter.y - sourceCenter.y) < 88;
+      });
+
+      if (!target) {
+        showFeedback("Need same level");
+        return;
+      }
+
+      target.dataset.level = String(Number(target.dataset.level) + 1);
+      updateCannonLabel(target);
+      cannons.splice(cannons.indexOf(source), 1);
+      source.remove();
+      updateScore(score + 10);
+      showFeedback("Merged " + target.textContent);
+    }
+
     [0, 1, 2].forEach((_, index) => {
       const cannon = document.createElement("button");
       cannon.className = "cannon";
-      cannon.textContent = index === 2 ? "L2" : "L1";
+      cannon.dataset.level = index === 2 ? "2" : "1";
       cannon.style.left = 82 + index * 78 + "px";
       cannon.style.top = "500px";
-      cannon.style.width = "58px";
-      cannon.style.height = "58px";
-      cannon.addEventListener("click", () => {
-        score += 5;
-        hud.textContent = "Score " + score;
-        cannon.textContent = "L" + Math.min(5, Math.floor(score / 10) + 1);
+      updateCannonLabel(cannon);
+      cannon.addEventListener("pointerdown", (event) => {
+        active = {
+          el: cannon,
+          offsetX: event.offsetX,
+          offsetY: event.offsetY
+        };
+        cannon.setPointerCapture(event.pointerId);
       });
+      cannon.addEventListener("pointermove", (event) => {
+        if (!active || active.el !== cannon) return;
+        const rect = root.getBoundingClientRect();
+        const x = Math.max(24, Math.min(306, event.clientX - rect.left - active.offsetX));
+        const y = Math.max(140, Math.min(560, event.clientY - rect.top - active.offsetY));
+        cannon.style.left = x + "px";
+        cannon.style.top = y + "px";
+      });
+      cannon.addEventListener("pointerup", () => {
+        if (active && active.el === cannon) {
+          mergeIfPossible(cannon);
+        }
+        active = null;
+      });
+      cannons.push(cannon);
       layer.appendChild(cannon);
     });
+  }
+
+  if (PROJECT.templateId === "simple-end-card" || PROJECT.templateId === "intro-cta") {
+    const card = document.createElement("section");
+    card.className = "flow-card";
+    const headline = document.createElement("h2");
+    headline.textContent = PROJECT.templateId === "simple-end-card" ? PROJECT.settings.endCardTitle : "Offer screen";
+    const copy = document.createElement("p");
+    copy.textContent = PROJECT.templateId === "simple-end-card"
+      ? PROJECT.settings.endCardSubtitle
+      : "This step checks the transition between intro promise, playable action, and CTA.";
+    const button = document.createElement("button");
+    button.textContent = PROJECT.templateId === "simple-end-card" ? PROJECT.settings.ctaText : "Continue to CTA";
+    button.addEventListener("click", () => {
+      if (PROJECT.templateId === "simple-end-card") {
+        updateScore(score + 25);
+        showFeedback("CTA tap recorded");
+      } else {
+        nextScene();
+      }
+    });
+    card.appendChild(headline);
+    card.appendChild(copy);
+    card.appendChild(button);
+    layer.appendChild(card);
   }
 
   root.appendChild(layer);

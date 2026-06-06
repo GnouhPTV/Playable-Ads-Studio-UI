@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { PhaserPreviewProps } from "@/types/game";
 import { createPhaserConfig } from "@/lib/game/phaserConfig";
+import { createCtaFlowScene } from "@/lib/game/scenes/CtaFlowScene";
+import { createGemCollectorScene } from "@/lib/game/scenes/GemCollectorScene";
 import { createMergeCannonScene } from "@/lib/game/scenes/MergeCannonScene";
 import { createRunnerGateScene } from "@/lib/game/scenes/RunnerGateScene";
 import { createTapMonsterScene } from "@/lib/game/scenes/TapMonsterScene";
@@ -28,12 +30,15 @@ export function PhaserPreview({ project }: PhaserPreviewProps) {
       try {
         const PhaserModule = await import("phaser");
         const Phaser = (PhaserModule as any).default ?? PhaserModule;
-        const scene =
-          project.templateId === "runner-gate"
-            ? createRunnerGateScene(Phaser, project)
-            : project.templateId === "tap-monster"
-              ? createTapMonsterScene(Phaser, project)
-              : createMergeCannonScene(Phaser, project);
+        const scenes = {
+          "gem-collector": createGemCollectorScene,
+          "intro-cta": createCtaFlowScene,
+          "merge-cannon": createMergeCannonScene,
+          "runner-gate": createRunnerGateScene,
+          "simple-end-card": createCtaFlowScene,
+          "tap-monster": createTapMonsterScene
+        };
+        const scene = scenes[project.templateId](Phaser, project);
 
         if (cancelled || !mountRef.current) {
           return;

@@ -26,6 +26,7 @@ yarn-error.log*
 # editor
 .vscode/
 .idea/
+CONTRIBUTING.md
 
 # OS
 .DS_Store
