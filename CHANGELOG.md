@@ -4,7 +4,7 @@ All notable changes to Playable Ads Studio will be documented in this file.
 
 This project uses a solo-dev `main` branch workflow. Release tags mark stable checkpoints.
 
-## [Unreleased]
+## [0.3.0] - Playable Preview & Export Runtime
 
 ### Fixed
 
