@@ -8,7 +8,8 @@ import type {
   ImageObjectProps,
   PlayableProject,
   ShapeObjectProps,
-  TextObjectProps
+  TextObjectProps,
+  VideoObjectProps
 } from "@/types/project";
 import { ActionPanel } from "@/components/editor/ActionPanel";
 import { AnimationPanel } from "@/components/editor/AnimationPanel";
@@ -178,6 +179,40 @@ function TypeSpecificFields({
             CTA URLs are placeholders in this local MVP. Real ad networks may require approved click handling.
           </p>
         ) : null}
+      </Section>
+    );
+  }
+
+  if (object.type === "video") {
+    const props = object.props as VideoObjectProps;
+
+    return (
+      <Section title="Video">
+        <AssetSelect assets={assets.filter((asset) => asset.type === "video")} value={props.assetId ?? ""} onChange={(assetId) => {
+          const asset = assets.find((item) => item.id === assetId);
+          updateProps({ ...props, assetId, src: asset?.dataUrl ?? "" });
+        }} />
+        <SelectField
+          label="Fit mode"
+          value={props.fit ?? "cover"}
+          onChange={(value) => updateProps({ ...props, fit: value as VideoObjectProps["fit"] })}
+          options={[
+            ["contain", "Contain"],
+            ["cover", "Cover"],
+            ["stretch", "Stretch"]
+          ]}
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <NumberField label="Start time" value={props.startTime ?? 0} onChange={(value) => updateProps({ ...props, startTime: Math.max(0, value) })} />
+          <NumberField label="End time" value={props.endTime ?? 0} onChange={(value) => updateProps({ ...props, endTime: Math.max(0, value) })} />
+        </div>
+        <CheckboxField label="Muted" checked={props.muted} onChange={(value) => updateProps({ ...props, muted: value })} />
+        <CheckboxField label="Autoplay" checked={props.autoplay} onChange={(value) => updateProps({ ...props, autoplay: value })} />
+        <CheckboxField label="Loop" checked={props.loop} onChange={(value) => updateProps({ ...props, loop: value })} />
+        <CheckboxField label="Show controls in preview" checked={props.controls} onChange={(value) => updateProps({ ...props, controls: value })} />
+        <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-800">
+          Browser autoplay usually requires muted video until the viewer taps.
+        </p>
       </Section>
     );
   }

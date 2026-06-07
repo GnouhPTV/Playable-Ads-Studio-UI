@@ -6,6 +6,7 @@ import type { EditorAction, EditorObject, PlayableAsset } from "@/types/project"
 import { CanvasObject } from "@/components/editor/CanvasObject";
 import { SelectionBox } from "@/components/editor/SelectionBox";
 import type { ResizeHandlePosition } from "@/components/editor/ResizeHandles";
+import { PlayableRuntime } from "@/components/runtime/PlayableRuntime";
 import { useEditorStore } from "@/store/editorStore";
 
 const CANVAS_WIDTH = 360;
@@ -142,8 +143,18 @@ export function DesignCanvas() {
       return;
     }
 
-    if (action.type === "nextScene" && action.targetSceneId) {
+    if ((action.type === "nextScene" || action.type === "goToScene") && action.targetSceneId) {
       setSelectedScene(action.targetSceneId);
+      return;
+    }
+
+    if (action.type === "nextScene") {
+      const index = project.scenes.findIndex((item) => item.id === currentSceneId);
+      const nextScene = project.scenes[Math.min(index + 1, project.scenes.length - 1)];
+
+      if (nextScene) {
+        setSelectedScene(nextScene.id);
+      }
       return;
     }
 
@@ -158,6 +169,15 @@ export function DesignCanvas() {
 
     if (action.type === "replay") {
       setSelectedScene(project.scenes[0]?.id ?? currentSceneId ?? "");
+      return;
+    }
+
+    if (action.type === "showEndCard") {
+      const endCard = project.scenes.find((item) => item.type === "endCard");
+
+      if (endCard) {
+        setSelectedScene(endCard.id);
+      }
       return;
     }
 
@@ -181,6 +201,28 @@ export function DesignCanvas() {
           loop: false,
           playOnSceneStart: false,
           playOnClick: true
+        }
+      });
+      return;
+    }
+
+    if (asset.type === "video") {
+      addObject("video", {
+        x,
+        y,
+        width: 220,
+        height: 180,
+        name: asset.name,
+        props: {
+          assetId: asset.id,
+          src: asset.dataUrl,
+          fit: "cover",
+          muted: true,
+          loop: false,
+          autoplay: true,
+          controls: false,
+          startTime: 0,
+          endTime: 0
         }
       });
       return;
@@ -460,12 +502,21 @@ export function DesignCanvas() {
               </span>
             </div>
 
-            {sceneBackgroundAsset ? (
+            {sceneBackgroundAsset && editorMode === "design" ? (
               <img
                 src={sceneBackgroundAsset.dataUrl}
                 alt=""
                 className="pointer-events-none absolute inset-0 h-full w-full object-cover"
                 draggable={false}
+              />
+            ) : null}
+
+            {editorMode === "preview" ? (
+              <PlayableRuntime
+                key={`${project.id}-${project.updatedAt}`}
+                project={project}
+                className="absolute inset-0"
+                onCta={(url) => window.open(url, "_blank", "noopener,noreferrer")}
               />
             ) : null}
 
@@ -484,18 +535,20 @@ export function DesignCanvas() {
               <div className="pointer-events-none absolute inset-x-5 bottom-8 top-12 z-[55] rounded-xl border border-dashed border-emerald-300/80" />
             ) : null}
 
-            {sceneObjects.map((object) => (
-              <CanvasObject
-                key={object.id}
-                object={object}
-                assets={assets}
-                selected={selectedObjectId === object.id}
-                mode={editorMode}
-                onSelect={selectObject}
-                onDragStart={startDrag}
-                onAction={runAction}
-              />
-            ))}
+            {editorMode === "design"
+              ? sceneObjects.map((object) => (
+                  <CanvasObject
+                    key={object.id}
+                    object={object}
+                    assets={assets}
+                    selected={selectedObjectId === object.id}
+                    mode={editorMode}
+                    onSelect={selectObject}
+                    onDragStart={startDrag}
+                    onAction={runAction}
+                  />
+                ))
+              : null}
 
             {selectedObject && editorMode === "design" ? (
               <SelectionBox object={selectedObject} onResizeStart={startResize} onRotateStart={startRotate} />

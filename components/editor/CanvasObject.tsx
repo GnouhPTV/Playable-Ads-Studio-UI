@@ -1,6 +1,7 @@
 "use client";
 
-import { Music2 } from "lucide-react";
+import type { ReactNode } from "react";
+import { Music2, Video } from "lucide-react";
 import type {
   AudioObjectProps,
   ButtonObjectProps,
@@ -10,7 +11,8 @@ import type {
   ImageObjectProps,
   PlayableAsset,
   ShapeObjectProps,
-  TextObjectProps
+  TextObjectProps,
+  VideoObjectProps
 } from "@/types/project";
 
 interface CanvasObjectProps {
@@ -174,6 +176,27 @@ function renderObject(
     );
   }
 
+  if (object.type === "video") {
+    const props = object.props as VideoObjectProps;
+    const asset = props.assetId ? assets.find((item) => item.id === props.assetId) : null;
+    const src = props.src || asset?.dataUrl;
+
+    return src ? (
+      <video
+        src={src}
+        className="h-full w-full bg-black"
+        style={{ objectFit: props.fit === "stretch" ? "fill" : props.fit }}
+        muted={props.muted}
+        loop={props.loop}
+        autoPlay={props.autoplay && mode === "preview"}
+        controls={props.controls && mode === "preview"}
+        playsInline
+      />
+    ) : (
+      <Placeholder label="Video" icon={<Video className="size-4" aria-hidden />} />
+    );
+  }
+
   if (object.type === "shape") {
     const props = object.props as ShapeObjectProps;
 
@@ -224,10 +247,13 @@ function renderObject(
   );
 }
 
-function Placeholder({ label }: { label: string }) {
+function Placeholder({ label, icon }: { label: string; icon?: ReactNode }) {
   return (
     <div className="grid h-full w-full place-items-center rounded-lg border border-dashed border-slate-300 bg-white/80 text-xs font-black text-slate-500">
-      {label}
+      <span className="inline-flex items-center gap-2">
+        {icon}
+        {label}
+      </span>
     </div>
   );
 }

@@ -18,6 +18,7 @@ import {
   Settings2,
   Shapes,
   Type,
+  Video,
   Wand2
 } from "lucide-react";
 import type { EditorObjectType, InteractionMechanic } from "@/types/project";
@@ -31,6 +32,7 @@ type LibraryTab = "objects" | "assets" | "scenes" | "templates" | "interactions"
 const objectButtons: { type: EditorObjectType; label: string; icon: typeof Type }[] = [
   { type: "text", label: "Add Text", icon: Type },
   { type: "image", label: "Add Image", icon: Image },
+  { type: "video", label: "Add Video", icon: Video },
   { type: "button", label: "Add Button", icon: MousePointerClick },
   { type: "shape", label: "Add Shape", icon: Shapes },
   { type: "animatedSprite", label: "Add Animated Sprite", icon: Film },

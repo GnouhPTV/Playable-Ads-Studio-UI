@@ -28,7 +28,11 @@ function getMissingActionTargets(project: PlayableProject) {
   const sceneIds = new Set(project.scenes.map((scene) => scene.id));
 
   return project.objects.filter((object) =>
-    object.actions.some((action) => action.type === "nextScene" && action.targetSceneId && !sceneIds.has(action.targetSceneId))
+    object.actions.some((action) =>
+      (action.type === "nextScene" || action.type === "goToScene") &&
+      action.targetSceneId &&
+      !sceneIds.has(action.targetSceneId)
+    )
   );
 }
 
@@ -36,9 +40,11 @@ export function validateProjectForExport(project: PlayableProject): ValidationIt
   const estimatedBytes = estimateProjectBytes(project);
   const imageObjects = project.objects.filter((object) => object.type === "image" || object.type === "animatedSprite");
   const audioObjects = project.objects.filter((object) => object.type === "audio");
+  const videoObjects = project.objects.filter((object) => object.type === "video");
   const hasCtaButton = project.objects.some((object) => object.type === "ctaButton");
   const missingImageSources = imageObjects.filter((object) => !objectHasSource(project, object.id));
   const missingAudioSources = audioObjects.filter((object) => !objectHasSource(project, object.id));
+  const missingVideoSources = videoObjects.filter((object) => !objectHasSource(project, object.id));
   const missingActionTargets = getMissingActionTargets(project);
 
   return [
@@ -106,6 +112,15 @@ export function validateProjectForExport(project: PlayableProject): ValidationIt
         missingAudioSources.length === 0
           ? "All audio objects have a source or there are no audio objects."
           : `${missingAudioSources.length} audio object needs an uploaded audio source.`
+    },
+    {
+      id: "video-sources",
+      label: "Video object sources",
+      level: missingVideoSources.length === 0 ? "pass" : "error",
+      message:
+        missingVideoSources.length === 0
+          ? "All video objects have a source or there are no video objects."
+          : `${missingVideoSources.length} video object needs an uploaded video source.`
     },
     {
       id: "action-targets",

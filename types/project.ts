@@ -31,6 +31,7 @@ export type EditorMode = "design" | "preview";
 export type EditorObjectType =
   | "text"
   | "image"
+  | "video"
   | "button"
   | "shape"
   | "animatedSprite"
@@ -38,7 +39,7 @@ export type EditorObjectType =
   | "background"
   | "ctaButton";
 
-export type ActionType = "none" | "nextScene" | "startGame" | "openUrl" | "replay";
+export type ActionType = "none" | "nextScene" | "goToScene" | "startGame" | "openUrl" | "replay" | "showEndCard";
 
 export type AnimationPreset =
   | "none"
@@ -76,6 +77,18 @@ export interface ImageObjectProps {
   src: string;
   fit: "contain" | "cover" | "stretch";
   borderRadius: number;
+}
+
+export interface VideoObjectProps {
+  assetId?: string;
+  src: string;
+  fit: "contain" | "cover" | "stretch";
+  muted: boolean;
+  loop: boolean;
+  autoplay: boolean;
+  controls: boolean;
+  startTime: number;
+  endTime: number;
 }
 
 export interface ButtonObjectProps {
@@ -116,6 +129,7 @@ export interface AudioObjectProps {
 export type EditorObjectProps =
   | TextObjectProps
   | ImageObjectProps
+  | VideoObjectProps
   | ButtonObjectProps
   | ShapeObjectProps
   | AnimatedSpriteObjectProps
@@ -179,7 +193,7 @@ export interface PlayableScene {
 export interface PlayableAsset {
   id: string;
   name: string;
-  type: "image" | "spriteSheet" | "audio";
+  type: "image" | "spriteSheet" | "audio" | "video";
   dataUrl: string;
   mimeType: string;
   usage: AssetUsage;

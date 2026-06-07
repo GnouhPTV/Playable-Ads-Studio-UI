@@ -44,13 +44,15 @@ export function ActionPanel({ object }: { object: EditorObject }) {
           >
             <option value="none">none</option>
             <option value="nextScene">go to next scene</option>
+            <option value="goToScene">go to specific scene</option>
             <option value="startGame">start game</option>
+            <option value="showEndCard">show end card</option>
             <option value="openUrl">open CTA URL</option>
             <option value="replay">replay</option>
           </select>
         </label>
 
-        {action.type === "nextScene" ? (
+        {action.type === "nextScene" || action.type === "goToScene" ? (
           <label className="block">
             <span className="studio-label">Target scene</span>
             <select

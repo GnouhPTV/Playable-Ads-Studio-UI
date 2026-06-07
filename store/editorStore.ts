@@ -159,6 +159,20 @@ function defaultProps(type: EditorObjectType): EditorObjectProps {
     };
   }
 
+  if (type === "video") {
+    return {
+      assetId: "",
+      src: "",
+      fit: "cover",
+      muted: true,
+      loop: false,
+      autoplay: true,
+      controls: false,
+      startTime: 0,
+      endTime: 0
+    };
+  }
+
   return {
     assetId: "",
     src: "",
@@ -181,14 +195,16 @@ function createObject(
     name:
       defaults?.name ??
       (type === "ctaButton"
-        ? "CTA Button"
-        : type === "animatedSprite"
-          ? "Animated Sprite"
+          ? "CTA Button"
+          : type === "animatedSprite"
+            ? "Animated Sprite"
+            : type === "video"
+              ? "Video"
           : `${type.charAt(0).toUpperCase()}${type.slice(1)}`),
     x: type === "background" ? 0 : 100,
     y: type === "background" ? 0 : 230,
-    width: type === "background" ? 360 : type === "text" ? 180 : 140,
-    height: type === "background" ? 640 : type === "text" ? 52 : 70,
+    width: type === "background" ? 360 : type === "text" ? 180 : type === "video" ? 220 : 140,
+    height: type === "background" ? 640 : type === "text" ? 52 : type === "video" ? 180 : 70,
     rotation: 0,
     opacity: 1,
     zIndex: type === "background" ? -10 : maxZ + 1,

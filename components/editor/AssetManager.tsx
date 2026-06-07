@@ -33,6 +33,8 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
           forcedType ??
           (mimeType.startsWith("audio/")
             ? "audio"
+            : mimeType.startsWith("video/")
+              ? "video"
             : file.name.toLowerCase().includes("sprite")
               ? "spriteSheet"
               : "image");
@@ -83,6 +85,26 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
           fps: 8,
           loop: true,
           autoplay: true
+        }
+      });
+      return;
+    }
+
+    if (asset.type === "video") {
+      addObject("video", {
+        name: asset.name,
+        width: 220,
+        height: 180,
+        props: {
+          assetId: asset.id,
+          src: asset.dataUrl,
+          fit: "cover",
+          muted: true,
+          loop: false,
+          autoplay: true,
+          controls: false,
+          startTime: 0,
+          endTime: 0
         }
       });
       return;
@@ -139,6 +161,18 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
           src: asset.dataUrl
         }
       });
+      return;
+    }
+
+    if (asset.type === "video" && object.type === "video") {
+      updateObject(object.id, {
+        name: object.name === "Video" ? asset.name : object.name,
+        props: {
+          ...object.props,
+          assetId: asset.id,
+          src: asset.dataUrl
+        }
+      });
     }
   }
 
@@ -153,7 +187,7 @@ export function AssetManager(_props?: { project?: PlayableProject }) {
 
       <div className="grid gap-2">
         <UploadButton label="Upload Image" accept="image/png,image/jpeg,image/webp,image/svg+xml" icon={ImagePlus} onUpload={(files) => uploadFiles(files, "image")} />
-        <UploadButton label="Upload Video" accept="video/mp4,video/webm" icon={Video} onUpload={(files) => uploadFiles(files, "image")} helper="MVP stores as media asset placeholder." />
+        <UploadButton label="Upload Video" accept="video/mp4,video/webm" icon={Video} onUpload={(files) => uploadFiles(files, "video")} helper="Stored as a local video asset for preview and export." />
         <UploadButton label="Upload Sprite Sheet" accept="image/png,image/webp" icon={Wand2} onUpload={(files) => uploadFiles(files, "spriteSheet")} />
         <UploadButton label="Upload Audio" accept="audio/mpeg,audio/wav,audio/ogg" icon={Music2} onUpload={(files) => uploadFiles(files, "audio")} />
         <UploadButton label="Upload Font" accept=".ttf,.otf,.woff,.woff2" icon={FileType} onUpload={() => undefined} helper="Placeholder for future font loading." />
@@ -256,6 +290,15 @@ function AssetThumb({ asset }: { asset: PlayableAsset }) {
     return (
       <div className="grid size-14 shrink-0 place-items-center rounded-md border border-blue-200 bg-blue-50 text-blue-600">
         <Music2 className="size-5" aria-hidden />
+      </div>
+    );
+  }
+
+  if (asset.type === "video") {
+    return (
+      <div className="relative size-14 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-950">
+        <video src={asset.dataUrl} className="h-full w-full object-cover opacity-80" muted playsInline />
+        <Video className="absolute left-1/2 top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 text-white" aria-hidden />
       </div>
     );
   }

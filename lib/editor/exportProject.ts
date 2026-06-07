@@ -15,6 +15,10 @@ function parseDataUrl(asset: PlayableAsset) {
   const mime = meta.match(/data:(.*);base64/)?.[1] ?? asset.mimeType ?? "application/octet-stream";
   const extension = mime.includes("jpeg")
     ? "jpg"
+    : mime.includes("mp4")
+      ? "mp4"
+      : mime.includes("webm")
+        ? "webm"
     : mime.includes("svg")
       ? "svg"
       : mime.includes("webp")
@@ -37,16 +41,36 @@ function parseDataUrl(asset: PlayableAsset) {
 function buildExportProject(project: PlayableProject) {
   const assets = project.assets.map((asset) => {
     const parsed = parseDataUrl(asset);
+    const file = `assets/${asset.id}.${parsed.extension}`;
 
     return {
       ...asset,
-      file: `assets/${asset.id}.${parsed.extension}`
+      dataUrl: file,
+      file
     };
   });
+  const assetFileById = new Map(assets.map((asset) => [asset.id, asset.file]));
 
   return {
     ...project,
-    assets
+    assets,
+    objects: project.objects.map((object) => {
+      if (!("assetId" in object.props) || !object.props.assetId) {
+        return object;
+      }
+
+      const file = assetFileById.get(object.props.assetId);
+
+      return file
+        ? {
+            ...object,
+            props: {
+              ...object.props,
+              src: file
+            }
+          }
+        : object;
+    })
   };
 }
 
@@ -95,6 +119,10 @@ body { display: grid; place-items: center; overflow: hidden; }
   width: 100%;
   height: 100%;
   font-weight: 900;
+}
+.object video,
+.object img {
+  display: block;
 }
 .placeholder {
   display: grid;
@@ -300,10 +328,21 @@ function runAction(action) {
   userInteracted = true;
   playSceneStartAudio();
   if (!action || action.type === "none") return;
-  if (action.type === "nextScene" && action.targetSceneId) setSceneById(action.targetSceneId);
+  if (action.type === "nextScene") {
+    if (action.targetSceneId) {
+      setSceneById(action.targetSceneId);
+    } else {
+      nextScene();
+    }
+  }
+  if (action.type === "goToScene" && action.targetSceneId) setSceneById(action.targetSceneId);
   if (action.type === "startGame") {
     const gameplay = PROJECT.scenes.find((scene) => scene.type === "gameplay");
     if (gameplay) setSceneById(gameplay.id);
+  }
+  if (action.type === "showEndCard") {
+    const endCard = PROJECT.scenes.find((scene) => scene.type === "endCard");
+    if (endCard) setSceneById(endCard.id);
   }
   if (action.type === "openUrl") window.location.href = action.url || PROJECT.settings.ctaUrl || "#";
   if (action.type === "replay") {
@@ -353,7 +392,7 @@ function renderObject(object) {
 
   if (object.type === "image" || object.type === "animatedSprite" || object.type === "background") {
     const asset = props.assetId ? assetById(props.assetId) : null;
-    const src = props.src || (asset && asset.dataUrl);
+    const src = props.src || (asset && (asset.file || asset.dataUrl));
     if (src) {
       const img = document.createElement("img");
       img.src = src;
@@ -363,6 +402,38 @@ function renderObject(object) {
       img.style.objectFit = props.fit === "stretch" ? "fill" : props.fit || "contain";
       img.style.borderRadius = (props.borderRadius || 0) + "px";
       el.appendChild(img);
+      return el;
+    }
+  }
+
+  if (object.type === "video") {
+    const asset = props.assetId ? assetById(props.assetId) : null;
+    const src = props.src || (asset && (asset.file || asset.dataUrl));
+    if (src) {
+      const video = document.createElement("video");
+      video.src = src;
+      video.muted = props.muted !== false;
+      video.loop = Boolean(props.loop);
+      video.autoplay = props.autoplay !== false;
+      video.controls = Boolean(props.controls);
+      video.playsInline = true;
+      video.style.width = "100%";
+      video.style.height = "100%";
+      video.style.objectFit = props.fit === "stretch" ? "fill" : props.fit || "cover";
+      video.addEventListener("loadedmetadata", () => {
+        if (props.startTime > 0) video.currentTime = Math.min(props.startTime, video.duration || props.startTime);
+      });
+      video.addEventListener("timeupdate", () => {
+        if (props.endTime > 0 && video.currentTime >= props.endTime) {
+          if (props.loop) {
+            video.currentTime = props.startTime || 0;
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        }
+      });
+      el.appendChild(video);
       return el;
     }
   }
@@ -400,7 +471,7 @@ function renderObject(object) {
 function playAudioObject(object) {
   const props = object.props || {};
   const asset = props.assetId ? assetById(props.assetId) : null;
-  const src = props.src || (asset && asset.dataUrl);
+  const src = props.src || (asset && (asset.file || asset.dataUrl));
   if (!src) return;
   const audio = new Audio(src);
   audio.volume = props.volume ?? 0.8;
@@ -646,7 +717,7 @@ function renderScene() {
   if (scene.backgroundImageAssetId) {
     const bg = assetById(scene.backgroundImageAssetId);
     if (bg) {
-      root.style.backgroundImage = "url(" + bg.dataUrl + ")";
+      root.style.backgroundImage = "url(" + (bg.file || bg.dataUrl) + ")";
       root.style.backgroundSize = "cover";
       root.style.backgroundPosition = "center";
     }

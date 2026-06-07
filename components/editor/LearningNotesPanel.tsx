@@ -77,7 +77,8 @@ export function LearningNotesPanel({
           title="Export Readiness"
           items={[
             "Confirm the intro tells the player what to do.",
-            "Test the main interaction in the phone frame.",
+            "Test the runtime preview in the phone frame.",
+            "Verify video/audio objects have local sources.",
             "Make the CTA text clear before export."
           ]}
         />
@@ -85,8 +86,11 @@ export function LearningNotesPanel({
           icon={FileCode2}
           title="Files To Read"
           items={[
+            "types/project.ts",
+            "components/runtime/PlayableRuntime.tsx",
+            "lib/runtime/runtimeActions.ts",
             "store/editorStore.ts",
-            "components/game/PhaserPreview.tsx",
+            "lib/editor/exportProject.ts",
             `lib/game/scenes/${templateSceneFiles[project.templateId]}.ts`
           ]}
         />
