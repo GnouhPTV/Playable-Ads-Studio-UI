@@ -7,6 +7,7 @@ import type {
   PlayableScene,
   TemplateId
 } from "@/types/project";
+import { createDefaultLogicConfig, normalizeLogicConfig } from "@/lib/logic/defaultLogicConfigs";
 import { getTemplateDefinition } from "@/lib/templates/templateDefinitions";
 
 function createId(prefix: string) {
@@ -238,7 +239,20 @@ export function createDefaultObjects(projectName: string, scenes: PlayableScene[
       }
     },
     {
-      ...baseObject(endCard.id, "ctaButton", "CTA Button", 62, 432, 236, 58, 20),
+      ...baseObject(endCard.id, "text", "Final Score Text", 58, 320, 244, 42, 12),
+      props: {
+        text: "Final Score 0",
+        fontSize: 20,
+        fontWeight: "900",
+        color: "#ffffff",
+        align: "center",
+        strokeColor: "#000000",
+        strokeWidth: 0,
+        shadow: true
+      }
+    },
+    {
+      ...baseObject(endCard.id, "ctaButton", "CTA Button", 62, 420, 236, 56, 20),
       props: {
         label: "Play Full Game",
         backgroundColor: "#a3e635",
@@ -248,6 +262,17 @@ export function createDefaultObjects(projectName: string, scenes: PlayableScene[
       },
       actions: [{ type: "openUrl", url: "https://example.com/portfolio" }],
       animations: ["bounce"]
+    },
+    {
+      ...baseObject(endCard.id, "button", "Replay Button", 92, 492, 176, 46, 21),
+      props: {
+        label: "Replay",
+        backgroundColor: "#eff6ff",
+        textColor: "#1d4ed8",
+        borderRadius: 14,
+        action: { type: "replay" }
+      },
+      actions: [{ type: "replay" }]
     }
   ];
 }
@@ -258,6 +283,28 @@ export function createProjectFromTemplate(templateId: TemplateId): PlayableProje
   const copy = templateCopy[template.id];
   const scenes = createScenes(template.id, template.recommendedDuration);
 
+  const objects = createDefaultObjects(template.name, scenes);
+  const projectSettings = {
+    title: template.name,
+    duration: template.id === "tap-monster" ? 30 : template.recommendedDuration,
+    targetScore: template.id === "tap-monster" ? 20 : 80,
+    mainColor: template.accentColor,
+    accentColor: template.id === "runner-gate" ? "#fbbf24" : "#a3e635",
+    backgroundStyle: template.id === "runner-gate" ? "forestArcade" : "midnightGrid",
+    difficulty: template.difficulty,
+    ctaText: "Play Full Game",
+    ctaUrl: "https://example.com/portfolio",
+    introTitle: copy.intro,
+    introSubtitle: copy.subtitle,
+    playButtonText: "Play",
+    endCardTitle: copy.end,
+    endCardSubtitle: "This local MVP export is ready for learning and testing.",
+    orientation: "portrait",
+    networkPreset: "generic",
+    packageName: template.id,
+    compressionQuality: 80
+  } satisfies PlayableProject["settings"];
+
   return {
     id: createId("project"),
     name: template.name,
@@ -266,28 +313,10 @@ export function createProjectFromTemplate(templateId: TemplateId): PlayableProje
     updatedAt: now,
     mechanic: copy.mechanic,
     assets: [],
-    settings: {
-      title: template.name,
-      duration: template.recommendedDuration,
-      targetScore: template.id === "tap-monster" ? 12 : 80,
-      mainColor: template.accentColor,
-      accentColor: template.id === "runner-gate" ? "#fbbf24" : "#a3e635",
-      backgroundStyle: template.id === "runner-gate" ? "forestArcade" : "midnightGrid",
-      difficulty: template.difficulty,
-      ctaText: "Play Full Game",
-      ctaUrl: "https://example.com/portfolio",
-      introTitle: copy.intro,
-      introSubtitle: copy.subtitle,
-      playButtonText: "Play",
-      endCardTitle: copy.end,
-      endCardSubtitle: "This local MVP export is ready for learning and testing.",
-      orientation: "portrait",
-      networkPreset: "generic",
-      packageName: template.id,
-      compressionQuality: 80
-    },
+    settings: projectSettings,
     scenes,
-    objects: createDefaultObjects(template.name, scenes)
+    objects,
+    logicConfig: createDefaultLogicConfig(template.id, scenes, objects, projectSettings)
   };
 }
 
@@ -325,6 +354,7 @@ export function normalizeProject(project: PlayableProject): PlayableProject {
     ...project,
     scenes,
     assets,
-    objects
+    objects,
+    logicConfig: normalizeLogicConfig(project.templateId, scenes, objects, project.settings, project.logicConfig)
   };
 }

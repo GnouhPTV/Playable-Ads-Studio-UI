@@ -13,6 +13,7 @@ import type {
 } from "@/types/project";
 import { ActionPanel } from "@/components/editor/ActionPanel";
 import { AnimationPanel } from "@/components/editor/AnimationPanel";
+import { ObjectRolePanel } from "@/components/editor/ObjectRolePanel";
 import { Tooltip } from "@/components/editor/Tooltip";
 import { useEditorStore } from "@/store/editorStore";
 
@@ -85,6 +86,7 @@ export function PropertiesInspector({ project }: { project: PlayableProject }) {
           </section>
 
           <TypeSpecificFields object={object} assets={assets} updateProps={updateProps} />
+          <ObjectRolePanel project={project} object={object} />
           <AnimationPanel object={object} />
           <ActionPanel object={object} />
         </div>

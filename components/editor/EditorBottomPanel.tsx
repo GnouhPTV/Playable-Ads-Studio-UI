@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BookOpen, CheckCircle2, FileText, Layers, Lightbulb, TriangleAlert, XCircle } from "lucide-react";
+import { BookOpen, CheckCircle2, FileText, Gamepad2, Layers, TriangleAlert, XCircle } from "lucide-react";
 import type { PlayableProject } from "@/types/project";
 import { validateProjectForExport, type ValidationItem } from "@/lib/editor/validators";
 import { LayersPanel } from "@/components/editor/LayersPanel";
-import { LearningNotesPanel } from "@/components/editor/LearningNotesPanel";
+import { LogicPanel } from "@/components/editor/LogicPanel";
+import { TemplateGuidePanel } from "@/components/editor/TemplateGuidePanel";
 
-type BottomTab = "layers" | "notes" | "validation" | "guide";
+type BottomTab = "layers" | "gameplay" | "notes" | "validation" | "guide";
 
 interface EditorBottomPanelProps {
   project: PlayableProject;
@@ -16,9 +17,10 @@ interface EditorBottomPanelProps {
 
 const tabs: Array<{ id: BottomTab; label: string; icon: typeof Layers }> = [
   { id: "layers", label: "Layers", icon: Layers },
+  { id: "gameplay", label: "Gameplay", icon: Gamepad2 },
   { id: "notes", label: "Notes", icon: FileText },
   { id: "validation", label: "Validation", icon: CheckCircle2 },
-  { id: "guide", label: "Learning Guide", icon: BookOpen }
+  { id: "guide", label: "Guide", icon: BookOpen }
 ];
 
 export function EditorBottomPanel({ project, onShowOnboarding }: EditorBottomPanelProps) {
@@ -45,9 +47,10 @@ export function EditorBottomPanel({ project, onShowOnboarding }: EditorBottomPan
 
       <div className="p-4">
         {tab === "layers" ? <LayersPanel embedded /> : null}
+        {tab === "gameplay" ? <LogicPanel project={project} /> : null}
         {tab === "notes" ? <NotesPanel /> : null}
         {tab === "validation" ? <ValidationGrid items={validation} /> : null}
-        {tab === "guide" ? <LearningNotesPanel project={project} onShowOnboarding={onShowOnboarding} embedded /> : null}
+        {tab === "guide" ? <TemplateGuidePanel project={project} /> : null}
       </div>
     </section>
   );

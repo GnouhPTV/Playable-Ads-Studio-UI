@@ -1,3 +1,5 @@
+import type { PlayableLogicConfig } from "@/types/logic";
+
 export type TemplateId =
   | "merge-cannon"
   | "runner-gate"
@@ -211,4 +213,5 @@ export interface PlayableProject {
   assets: PlayableAsset[];
   objects: EditorObject[];
   mechanic: InteractionMechanic | null;
+  logicConfig: PlayableLogicConfig;
 }

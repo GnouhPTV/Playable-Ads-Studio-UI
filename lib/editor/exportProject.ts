@@ -147,6 +147,21 @@ body { display: grid; place-items: center; overflow: hidden; }
   font-size: 14px;
   font-weight: 900;
 }
+.tap-score,
+.tap-timer {
+  position: absolute;
+  top: 48px;
+  z-index: 12;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  backdrop-filter: blur(10px);
+}
+.tap-score { left: 16px; }
+.tap-timer { right: 16px; }
 .tap-target, .runner-player, .cannon, .gem {
   position: absolute;
   display: grid;
@@ -220,6 +235,68 @@ body { display: grid; place-items: center; overflow: hidden; }
   font-size: 12px;
   font-weight: 900;
 }
+.tap-end-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background: rgba(15, 23, 42, 0.74);
+  backdrop-filter: blur(10px);
+}
+.tap-end-card {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 18px;
+  background: #fff;
+  color: #0f172a;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.32);
+}
+.tap-end-card h2 {
+  margin: 8px 0 0;
+  font-size: 30px;
+  line-height: 1;
+}
+.tap-end-card p {
+  margin: 12px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+.tap-score-box {
+  margin-top: 18px;
+  border-radius: 12px;
+  background: #eff6ff;
+  padding: 12px;
+}
+.tap-score-box strong {
+  display: block;
+  color: #2563eb;
+  font-size: 42px;
+  line-height: 1;
+}
+.tap-end-card button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 900;
+}
+.tap-cta {
+  margin-top: 18px;
+  background: #2563eb;
+  color: #fff;
+}
+.tap-replay {
+  margin-top: 10px;
+  border: 1px solid #bfdbfe !important;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
 .animate-fadeIn { animation: fade-in 420ms ease both; }
 .animate-popIn { animation: pop-in 360ms cubic-bezier(0.2, 1.3, 0.35, 1) both; }
 .animate-bounce { animation: bounce 1.4s ease-in-out infinite; }
@@ -289,9 +366,11 @@ function createPlayableJs(project: PlayableProject) {
 
 const PROJECT = ${exportProject};
 const root = document.getElementById("playable");
+const LOGIC = PROJECT.logicConfig || {};
 let sceneIndex = 0;
 let score = 0;
 let timerId = null;
+let mechanicTimerId = null;
 let userInteracted = false;
 
 function assetById(id) {
@@ -306,9 +385,55 @@ function currentScene() {
   return PROJECT.scenes[sceneIndex] || PROJECT.scenes[0];
 }
 
+function roleForObject(objectId) {
+  return (LOGIC.objectRoles || []).find((role) => role.objectId === objectId) || null;
+}
+
+function objectByRole(roleName) {
+  const role = (LOGIC.objectRoles || []).find((item) => item.role === roleName);
+  return role ? PROJECT.objects.find((object) => object.id === role.objectId) : null;
+}
+
+function actionsForObject(objectId, trigger) {
+  return (LOGIC.actions || []).filter((action) => action.targetObjectId === objectId && (!trigger || action.trigger === trigger));
+}
+
+function actionsByTrigger(trigger) {
+  return (LOGIC.actions || []).filter((action) => action.trigger === trigger);
+}
+
+function logicNumber(value, fallback) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function logicBoolean(value, fallback) {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function roleNumber(role, key, fallback) {
+  return logicNumber(role && role.settings ? role.settings[key] : undefined, fallback);
+}
+
+function roleBoolean(role, key, fallback) {
+  return logicBoolean(role && role.settings ? role.settings[key] : undefined, fallback);
+}
+
+function roleString(role, key, fallback) {
+  const value = role && role.settings ? role.settings[key] : undefined;
+  return typeof value === "string" ? value : fallback;
+}
+
 function clearTimer() {
-  if (timerId) window.clearTimeout(timerId);
+  if (timerId) {
+    window.clearTimeout(timerId);
+    window.clearInterval(timerId);
+  }
+  if (mechanicTimerId) {
+    window.clearTimeout(mechanicTimerId);
+    window.clearInterval(mechanicTimerId);
+  }
   timerId = null;
+  mechanicTimerId = null;
 }
 
 function setSceneById(sceneId) {
@@ -317,6 +442,11 @@ function setSceneById(sceneId) {
     sceneIndex = nextIndex;
     renderScene();
   }
+}
+
+function setSceneByType(type) {
+  const scene = PROJECT.scenes.find((item) => item.type === type);
+  if (scene) setSceneById(scene.id);
 }
 
 function nextScene() {
@@ -350,6 +480,48 @@ function runAction(action) {
     score = 0;
     renderScene();
   }
+}
+
+function runLogicAction(action) {
+  userInteracted = true;
+  if (!action) return;
+  if (action.type === "addScore" || action.type === "addGems") {
+    score += logicNumber(action.value, 1);
+    const reached = LOGIC.score && LOGIC.score.enabled && score >= logicNumber(LOGIC.score.targetValue, 999999);
+    if (reached) actionsByTrigger("onScoreReached").forEach(runLogicAction);
+    return;
+  }
+  if (action.type === "subtractScore") {
+    score = Math.max(0, score - logicNumber(action.value, 1));
+    return;
+  }
+  if (action.type === "goToScene" && action.targetSceneId) {
+    setSceneById(action.targetSceneId);
+    return;
+  }
+  if (action.type === "nextScene") {
+    nextScene();
+    return;
+  }
+  if (action.type === "showEndCard") {
+    setSceneByType("endCard");
+    return;
+  }
+  if (action.type === "replay") {
+    sceneIndex = 0;
+    score = logicNumber(LOGIC.score && LOGIC.score.initialValue, 0);
+    renderScene();
+    return;
+  }
+  if (action.type === "openUrl") {
+    window.location.href = action.value || PROJECT.settings.ctaUrl || "#";
+  }
+}
+
+function runObjectActions(objectId, trigger) {
+  const actions = actionsForObject(objectId, trigger);
+  actions.forEach(runLogicAction);
+  return actions.length > 0;
 }
 
 function objectAnimationClass(object) {
@@ -444,7 +616,10 @@ function renderObject(object) {
     button.style.background = props.backgroundColor || PROJECT.settings.mainColor;
     button.style.color = props.textColor || "#071014";
     button.style.borderRadius = (props.borderRadius || 12) + "px";
-    button.addEventListener("click", () => runAction(props.action || (object.actions && object.actions[0])));
+    button.addEventListener("click", () => {
+      const handled = runObjectActions(object.id, "onClick");
+      if (!handled) runAction(props.action || (object.actions && object.actions[0]));
+    });
     el.appendChild(button);
     return el;
   }
@@ -491,15 +666,6 @@ function renderTemplateGameplay(scene) {
   if (scene.type !== "gameplay") return;
   const layer = document.createElement("div");
   layer.className = "mechanic-layer";
-  const hud = document.createElement("div");
-  hud.className = "hud";
-  hud.textContent = "Score " + score;
-  layer.appendChild(hud);
-
-  function updateScore(nextScore) {
-    score = Math.max(0, nextScore);
-    hud.textContent = "Score " + score;
-  }
 
   function showFeedback(text) {
     const old = layer.querySelector(".feedback");
@@ -519,26 +685,107 @@ function renderTemplateGameplay(scene) {
   }
 
   if (PROJECT.templateId === "tap-monster") {
+    const targetObject = objectByRole("tapTarget");
+    const targetRole = targetObject ? roleForObject(targetObject.id) : null;
+    const scorePerTap = roleNumber(targetRole, "scorePerTap", logicNumber(LOGIC.settings && LOGIC.settings.scorePerTap, 1));
+    const randomizeAfterTap = roleBoolean(targetRole, "randomizeAfterTap", logicBoolean(LOGIC.settings && LOGIC.settings.randomizeAfterTap, true));
+    let remaining = logicNumber(LOGIC.timer && LOGIC.timer.duration, scene.duration || PROJECT.settings.duration || 30);
+    const scoreHud = document.createElement("div");
+    scoreHud.className = "tap-score";
+    scoreHud.textContent = "Score " + score;
+    const timerHud = document.createElement("div");
+    timerHud.className = "tap-timer";
+    timerHud.textContent = remaining + "s";
     const target = document.createElement("button");
     target.className = "tap-target";
     target.textContent = "TAP";
-    target.style.left = "130px";
-    target.style.top = "280px";
-    target.style.width = "100px";
-    target.style.height = "100px";
+    target.style.width = (targetObject ? targetObject.width : 100) + "px";
+    target.style.height = (targetObject ? targetObject.height : 100) + "px";
+    if (targetObject && targetObject.props) {
+      if (targetObject.type === "shape") {
+        target.style.background = targetObject.props.fillColor || PROJECT.settings.mainColor;
+        target.style.border = (targetObject.props.strokeWidth || 0) + "px solid " + (targetObject.props.strokeColor || "transparent");
+        target.style.borderRadius = targetObject.props.shape === "circle" ? "999px" : targetObject.props.shape === "roundedRectangle" ? "18px" : "0";
+      }
+    }
+    function moveTarget() {
+      const area = roleString(targetRole, "randomArea", "safeArea");
+      const width = targetObject ? targetObject.width : 100;
+      const height = targetObject ? targetObject.height : 100;
+      const bounds = area === "fullScreen"
+        ? { left: 16, top: 52, right: 360 - width - 16, bottom: 640 - height - 32 }
+        : { left: 32, top: 120, right: 360 - width - 32, bottom: 640 - height - 120 };
+      target.style.left = bounds.left + Math.random() * Math.max(1, bounds.right - bounds.left) + "px";
+      target.style.top = bounds.top + Math.random() * Math.max(1, bounds.bottom - bounds.top) + "px";
+    }
+    function updateTapScore(nextScore) {
+      score = Math.max(0, nextScore);
+      scoreHud.textContent = "Score " + score;
+    }
     target.addEventListener("click", () => {
-      updateScore(score + 1);
-      target.style.left = 40 + Math.random() * 220 + "px";
-      target.style.top = 140 + Math.random() * 330 + "px";
-      showFeedback("+1 tap");
+      const handled = targetObject ? runObjectActions(targetObject.id, "onTap") : false;
+      if (!handled) updateTapScore(score + scorePerTap);
+      scoreHud.textContent = "Score " + score;
+      if (randomizeAfterTap) moveTarget();
+      showFeedback("+" + scorePerTap);
     });
+    moveTarget();
+    layer.appendChild(scoreHud);
+    layer.appendChild(timerHud);
     layer.appendChild(target);
+    timerId = window.setInterval(() => {
+      remaining -= 1;
+      timerHud.textContent = Math.max(remaining, 0) + "s";
+      if (remaining <= 0) {
+        clearTimer();
+        const timerActions = actionsByTrigger("onTimerEnd");
+        if (timerActions.length > 0) {
+          timerActions.forEach(runLogicAction);
+        } else {
+          setSceneByType("endCard");
+        }
+      }
+    }, 1000);
+    root.appendChild(layer);
+    return;
+  }
+
+  const hud = document.createElement("div");
+  hud.className = "hud";
+  hud.textContent = "Score " + score;
+  layer.appendChild(hud);
+  const timerHud = document.createElement("div");
+  timerHud.className = "tap-timer";
+  let remaining = logicNumber(LOGIC.timer && LOGIC.timer.duration, scene.duration || PROJECT.settings.duration || 30);
+  timerHud.textContent = remaining + "s";
+  layer.appendChild(timerHud);
+
+  function updateScore(nextScore) {
+    score = Math.max(0, nextScore);
+    hud.textContent = "Score " + score;
+  }
+
+  if (LOGIC.timer && LOGIC.timer.enabled) {
+    timerId = window.setInterval(() => {
+      remaining -= 1;
+      timerHud.textContent = Math.max(remaining, 0) + "s";
+      if (remaining <= 0) {
+        clearTimer();
+        const timerActions = actionsByTrigger("onTimerEnd");
+        if (timerActions.length > 0) {
+          timerActions.forEach(runLogicAction);
+        } else {
+          setSceneByType("endCard");
+        }
+      }
+    }, 1000);
   }
 
   if (PROJECT.templateId === "gem-collector") {
     function spawnGem(index) {
       const gem = document.createElement("button");
-      const value = index % 3 === 0 ? 10 : 5;
+      const value = logicNumber(LOGIC.settings && LOGIC.settings.gemValue, index % 3 === 0 ? 10 : 5);
+      const respawn = logicBoolean(LOGIC.settings && LOGIC.settings.respawnOnTap, true);
       gem.className = "gem";
       gem.style.left = 42 + Math.random() * 250 + "px";
       gem.style.top = 150 + Math.random() * 330 + "px";
@@ -552,12 +799,13 @@ function renderTemplateGameplay(scene) {
         updateScore(score + value);
         showFeedback("+" + value + " gems");
         gem.remove();
-        spawnGem(index + 1);
+        if (respawn) spawnGem(index + 1);
       });
       layer.appendChild(gem);
     }
 
-    for (let index = 0; index < 6; index += 1) {
+    const gemCount = logicNumber(LOGIC.settings && LOGIC.settings.gemCount, 6);
+    for (let index = 0; index < gemCount; index += 1) {
       spawnGem(index);
     }
   }
@@ -574,9 +822,11 @@ function renderTemplateGameplay(scene) {
 
     function applyGate(gate, label) {
       if (!gates.includes(gate)) return;
-      if (label === "+10") updateScore(score + 10);
-      if (label === "x2") updateScore(Math.max(2, score * 2));
-      if (label === "-5") updateScore(score - 5);
+      if (label === "x2") {
+        updateScore(Math.max(2, score * 2));
+      } else {
+        updateScore(score + Number(label.replace("+", "")));
+      }
       gates.splice(gates.indexOf(gate), 1);
       gate.remove();
       showFeedback(label + " gate");
@@ -599,13 +849,17 @@ function renderTemplateGameplay(scene) {
       player.style.left = x + "px";
       checkRunnerCollisions();
     });
-    ["+10", "x2", "-5"].forEach((label, index) => {
+    const gateValues = Array.isArray(LOGIC.settings && LOGIC.settings.gateValues)
+      ? LOGIC.settings.gateValues.map(Number).filter(Number.isFinite)
+      : [10, 2, -5];
+    gateValues.forEach((value, index) => {
+      const label = value === 2 ? "x2" : (value > 0 ? "+" : "") + value;
       const gate = document.createElement("div");
       gate.className = "gate";
       gate.textContent = label;
       gate.style.left = 40 + index * 105 + "px";
       gate.style.top = "420px";
-      gate.style.background = label.startsWith("-") ? "#fb7185" : PROJECT.settings.accentColor;
+      gate.style.background = value < 0 ? "#fb7185" : PROJECT.settings.accentColor;
       gate.addEventListener("click", () => applyGate(gate, label));
       gates.push(gate);
       layer.appendChild(gate);
@@ -616,6 +870,16 @@ function renderTemplateGameplay(scene) {
   if (PROJECT.templateId === "merge-cannon") {
     let active = null;
     const cannons = [];
+    let enemyHp = logicNumber(LOGIC.settings && LOGIC.settings.enemyHp, 3);
+    const enemy = document.createElement("div");
+    enemy.className = "tap-target";
+    enemy.style.left = "250px";
+    enemy.style.top = "170px";
+    enemy.style.width = "58px";
+    enemy.style.height = "58px";
+    enemy.style.background = "#fb7185";
+    enemy.textContent = "HP " + enemyHp;
+    layer.appendChild(enemy);
 
     function updateCannonLabel(cannon) {
       cannon.textContent = "L" + cannon.dataset.level;
@@ -678,6 +942,17 @@ function renderTemplateGameplay(scene) {
       cannons.push(cannon);
       layer.appendChild(cannon);
     });
+    mechanicTimerId = window.setInterval(() => {
+      const damage = logicNumber(LOGIC.settings && LOGIC.settings.cannonDamage, 1) * cannons.reduce((total, cannon) => total + Number(cannon.dataset.level || 1), 0);
+      enemyHp -= damage;
+      if (enemyHp <= 0) {
+        updateScore(score + logicNumber(LOGIC.settings && LOGIC.settings.coinReward, 10));
+        showFeedback("+ reward");
+        enemyHp = logicNumber(LOGIC.settings && LOGIC.settings.enemyHp, 3);
+      }
+      enemy.textContent = "HP " + Math.max(0, Math.ceil(enemyHp));
+      enemy.style.top = 150 + Math.random() * 130 + "px";
+    }, Math.max(250, logicNumber(LOGIC.settings && LOGIC.settings.fireRate, 1.1) * 1000));
   }
 
   if (PROJECT.templateId === "simple-end-card" || PROJECT.templateId === "intro-cta") {
@@ -708,6 +983,67 @@ function renderTemplateGameplay(scene) {
   root.appendChild(layer);
 }
 
+function renderTapMonsterEndCard(scene) {
+  if (PROJECT.templateId !== "tap-monster" || scene.type !== "endCard") return;
+  const titleObject = PROJECT.objects.find((object) => object.sceneId === scene.id && object.name.toLowerCase().includes("end card title"));
+  const subtitleObject = PROJECT.objects.find((object) => object.sceneId === scene.id && object.name.toLowerCase().includes("end card subtitle"));
+  const ctaObject = objectByRole("ctaButton");
+  const replayObject = objectByRole("replayButton");
+
+  const layer = document.createElement("div");
+  layer.className = "tap-end-layer";
+  const card = document.createElement("section");
+  card.className = "tap-end-card animate-popIn";
+
+  const eyebrow = document.createElement("div");
+  eyebrow.style.cssText = "color:#2563eb;font-size:12px;font-weight:900;text-transform:uppercase";
+  eyebrow.textContent = "Run complete";
+
+  const headline = document.createElement("h2");
+  headline.textContent = (titleObject && titleObject.props && titleObject.props.text) || (LOGIC.settings && LOGIC.settings.endCardTitle) || PROJECT.settings.endCardTitle || scene.title || "Great job!";
+
+  const copy = document.createElement("p");
+  copy.textContent = (subtitleObject && subtitleObject.props && subtitleObject.props.text) || (LOGIC.settings && LOGIC.settings.endCardSubtitle) || PROJECT.settings.endCardSubtitle || scene.subtitle || "You tapped the monster before time ran out.";
+
+  const scoreBox = document.createElement("div");
+  scoreBox.className = "tap-score-box";
+  const scoreLabel = document.createElement("div");
+  scoreLabel.style.cssText = "color:#64748b;font-size:11px;font-weight:900;text-transform:uppercase";
+  scoreLabel.textContent = "Final score";
+  const scoreValue = document.createElement("strong");
+  scoreValue.textContent = String(score);
+  scoreBox.appendChild(scoreLabel);
+  scoreBox.appendChild(scoreValue);
+
+  const cta = document.createElement("button");
+  cta.className = "tap-cta";
+  cta.textContent = (ctaObject && ctaObject.props && ctaObject.props.label) || (LOGIC.settings && LOGIC.settings.ctaText) || PROJECT.settings.ctaText || "View Portfolio";
+  cta.addEventListener("click", () => {
+    window.location.href = (LOGIC.settings && LOGIC.settings.ctaUrl) || PROJECT.settings.ctaUrl || "#";
+  });
+
+  const replay = document.createElement("button");
+  replay.className = "tap-replay";
+  replay.textContent = (replayObject && replayObject.props && replayObject.props.label) || "Replay";
+  replay.addEventListener("click", () => {
+    const handled = replayObject ? runObjectActions(replayObject.id, "onClick") : false;
+    if (!handled) {
+      score = logicNumber(LOGIC.score && LOGIC.score.initialValue, 0);
+      sceneIndex = 0;
+      renderScene();
+    }
+  });
+
+  card.appendChild(eyebrow);
+  card.appendChild(headline);
+  card.appendChild(copy);
+  card.appendChild(scoreBox);
+  card.appendChild(cta);
+  card.appendChild(replay);
+  layer.appendChild(card);
+  root.appendChild(layer);
+}
+
 function renderScene() {
   clearTimer();
   const scene = currentScene();
@@ -724,15 +1060,22 @@ function renderScene() {
   }
   renderTemplateGameplay(scene);
 
-  PROJECT.objects
-    .filter((object) => object.sceneId === scene.id)
-    .sort((a, b) => a.zIndex - b.zIndex)
-    .forEach((object) => {
-      const el = renderObject(object);
-      if (el) root.appendChild(el);
-    });
+  const skipDesignedObjects =
+    PROJECT.templateId === "tap-monster" && (scene.type === "gameplay" || scene.type === "endCard");
 
-  if (scene.duration && scene.type !== "endCard") {
+  if (!skipDesignedObjects) {
+    PROJECT.objects
+      .filter((object) => object.sceneId === scene.id)
+      .sort((a, b) => a.zIndex - b.zIndex)
+      .forEach((object) => {
+        const el = renderObject(object);
+        if (el) root.appendChild(el);
+      });
+  }
+
+  renderTapMonsterEndCard(scene);
+
+  if (scene.duration && scene.type !== "endCard" && !(scene.type === "gameplay" && LOGIC.timer && LOGIC.timer.enabled) && !(PROJECT.templateId === "tap-monster" && scene.type !== "endCard")) {
     timerId = window.setTimeout(nextScene, scene.duration * 1000);
   }
 }

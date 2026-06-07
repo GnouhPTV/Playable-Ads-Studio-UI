@@ -85,15 +85,113 @@ Objects are stored in `project.objects`. Each object has position, size, rotatio
 
 Scenes are stored in `project.scenes`. Each object belongs to one scene via `sceneId`. Switching scenes changes what the canvas and layers panel display.
 
-## 14. How Validation Works
+## 14. What Is A No-Code Playable Logic System
+
+A no-code playable logic system stores game behavior as data instead of hiding it inside one hardcoded scene file. In this app the behavior lives in `project.logicConfig`.
+
+The logic config includes score, timer, object roles, object actions, win/lose conditions, scene flow, and template settings. The editor panels modify this config, the preview runtime reads it, and the exported HTML includes it in `project.json`.
+
+## 15. How Object Roles Work
+
+Object roles connect visual objects to gameplay meaning. A text layer can become `scoreText`, a button can become `playButton`, and a monster shape can become `tapTarget`.
+
+Select an object, open `Playable Role`, choose a role, then edit role settings. For example, a Tap Target can define score per tap, random movement, tap animation, respawn delay, max taps, and whether it starts visible.
+
+## 16. How Actions Work
+
+Actions define what happens on triggers such as `onClick`, `onTap`, `onTimerEnd`, or `onScoreReached`.
+
+Examples:
+
+- Play Button: `On Click -> Go To Scene`
+- Tap Target: `On Tap -> Add Score`
+- Tap Target: `On Tap -> Randomize Position`
+- CTA Button: `On Click -> Open URL`
+- Replay Button: `On Click -> Replay`
+
+Use `ActionBuilder.tsx` to add or edit actions. Preview and export both read these actions.
+
+## 17. How Conditions Work
+
+Conditions describe when a playable should win, lose, or move to another scene. Examples include `timerEnded`, `scoreReached`, `objectTapped`, `enemyDestroyed`, `playerDead`, and `allTargetsCleared`.
+
+The current MVP stores conditions and validates them. Timer and score actions are already used by preview/export; deeper condition chains can be expanded later.
+
+## 18. How Tap Monster Template Works
+
+Tap Monster uses intro, gameplay, and end-card scenes.
+
+Default roles:
+
+- Play button: `playButton`
+- Monster: `tapTarget`
+- Score HUD: `scoreText`
+- Timer HUD: `timerText`
+- CTA: `ctaButton`
+- Replay: `replayButton`
+
+Default behavior: click Play, tap the monster, add score, optionally randomize monster position, count down the timer, show end card, click CTA or Replay.
+
+## 19. How Merge Cannon Template Works
+
+Merge Cannon uses a `cannon` role and template settings for cannon damage, fire rate, enemy HP, enemy speed, merge level limit, coin reward, gem reward, and game duration.
+
+The MVP preview/export supports dragging cannons, merging same-level cannons, showing an enemy HP target, auto-fire reward ticks, score changes, timer, and end card.
+
+## 20. How Runner Gate Template Works
+
+Runner Gate uses a `player` role and generated gates from logic settings. You can edit duration, player speed, lane count, gate values, and gem reward.
+
+The MVP preview/export supports drag-horizontal movement, passing gates, score changes, timer, and end card.
+
+## 21. How Gem Collector Template Works
+
+Gem Collector uses `collectible`, `scoreText`, and `timerText` roles. You can edit gem count, gem value, target score, timer duration, and respawn behavior.
+
+The MVP preview/export supports tapping gems, score increases, gems disappearing or respawning, timer, and end card.
+
+## 22. How Preview Runtime Reads Logic Config
+
+`components/runtime/PlayableRuntime.tsx` reads `project.logicConfig` and decides which objects are playable roles. It updates score and timer state, runs object actions, shows template mechanics, and renders CTA/replay behavior.
+
+Study these files:
+
+- `components/runtime/PlayableRuntime.tsx`
+- `lib/logic/logicRuntime.ts`
+- `lib/logic/defaultLogicConfigs.ts`
+
+## 23. How Export Runtime Reads Logic Config
+
+`lib/editor/exportProject.ts` writes the full project into the ZIP, including `logicConfig`. The exported `playable.js` reads object roles, actions, score, timer, scene flow, and template settings so the local `index.html` is playable.
+
+The export is still a local learning package. Production networks may require MRAID, click macros, compression, and QA wrappers.
+
+## 24. Build A Tap Monster Playable Step By Step
+
+1. Open `/templates`.
+2. Use `Tap Monster Playable`.
+3. Select the monster object.
+4. Set Playable Role to `Tap Target`.
+5. Change score per tap.
+6. Enable or disable random movement.
+7. Select Score Text and Timer Text roles if needed.
+8. Open the Gameplay tab.
+9. Change duration and target score.
+10. Preview the game.
+11. Export ZIP.
+12. Open exported `index.html` locally.
+
+## 25. How Validation Works
 
 `lib/editor/validators.ts` checks intro/gameplay/end-card scenes, CTA presence, duration, interaction mechanic, missing assets, broken scene actions, and estimated package size.
 
-## 15. How Export Works
+Logic validation also checks required roles for each template, such as Tap Target, Score Text, Timer Text, Player, Cannon, Collectible, and end card readiness.
+
+## 26. How Export Works
 
 `lib/editor/exportProject.ts` generates a ZIP containing `index.html`, `style.css`, `playable.js`, `assets/`, `project.json`, and `README_EXPORT.txt`.
 
-## 16. Video-To-Playable MVP
+## 27. Video-To-Playable MVP
 
 Route: `/video-to-playable`
 
@@ -101,19 +199,19 @@ This page is a functional local MVP for uploading MP4/WebM, previewing the video
 
 MVP limitation: the browser cannot restore a local `File` after refresh, so saved drafts remember overlay settings but require re-uploading the video before preview/export can include the actual asset.
 
-## 17. Runtime Preview & Export
+## 28. Runtime Preview & Export
 
 The editor preview uses `components/runtime/PlayableRuntime.tsx`, which renders the current `PlayableProject` without editor handles. It supports scene transitions, timers, click/tap actions, video/audio objects, animations, replay, CTA URL placeholders, and the Tap Monster score loop.
 
 The ZIP export in `lib/editor/exportProject.ts` writes a standalone `index.html`, `style.css`, `playable.js`, `manifest.json`, `project.json`, `README_EXPORT.txt`, and uploaded assets. Exports are local learning packages and may still need ad-network wrappers such as MRAID before production use.
 
-## 18. AI Builder MVP
+## 29. AI Builder MVP
 
 Route: `/ai-builder`
 
 This page generates mock structured JSON locally from a playable brief. It does not call any backend or AI API yet.
 
-## 19. Important Main Files
+## 30. Important Main Files
 
 - `app/page.tsx`: renders the dashboard through `AppShell`.
 - `app/templates/page.tsx`: renders the template gallery.
@@ -123,6 +221,11 @@ This page generates mock structured JSON locally from a playable brief. It does 
 - `components/editor/DesignCanvas.tsx`: phone canvas, object rendering, dragging, resizing, rotating, preview actions, keyboard shortcuts.
 - `components/runtime/PlayableRuntime.tsx`: shared React runtime used by editor preview.
 - `components/runtime/RuntimeObject.tsx`: object renderer for text, image, video, button, shape, sprite placeholder, audio, and CTA.
+- `components/editor/LogicPanel.tsx`: gameplay-level settings and conditions.
+- `components/editor/ObjectRolePanel.tsx`: object role editor and role settings.
+- `components/editor/ActionBuilder.tsx`: no-code action editor.
+- `components/editor/ConditionBuilder.tsx`: win/lose condition editor.
+- `components/editor/TemplateGuidePanel.tsx`: built-in template guide.
 - `components/editor/PropertiesInspector.tsx`: scene/object property editing.
 - `components/editor/SceneManager.tsx`: scene switching, renaming, duplicate, delete, add scene.
 - `components/editor/AssetManager.tsx`: upload, preview, drag/drop, assign, delete assets.
@@ -131,14 +234,17 @@ This page generates mock structured JSON locally from a playable brief. It does 
 - `store/editorStore.ts`: Zustand state and mutation logic.
 - `lib/editor/exportProject.ts`: local ZIP generation.
 - `lib/editor/validators.ts`: validation checklist logic.
+- `lib/logic/defaultLogicConfigs.ts`: default role/action/settings configs for templates.
+- `lib/logic/logicRuntime.ts`: helpers for reading object roles, actions, and settings.
+- `lib/logic/logicValidation.ts`: validation rules for playable logic.
 - `lib/runtime/runtimeActions.ts`: beginner-friendly action runner for runtime scene navigation and CTA behavior.
 - `lib/runtime/renderScene.ts`: helpers for scene and object lookup.
 
-## 20. Code Learning Guide
+## 31. Code Learning Guide
 
 Start with `types/project.ts`, then read `store/editorStore.ts`. After that, study `components/runtime/PlayableRuntime.tsx`, `RuntimeObject.tsx`, `DesignCanvas.tsx`, and `PropertiesInspector.tsx`. Finish with `validators.ts`, `exportProject.ts`, and `VideoToPlayablePage.tsx` to understand preview, validation, and export.
 
-## 21. Beginner Exercises
+## 32. Beginner Exercises
 
 - Add a new object template in `ObjectLibrary.tsx`.
 - Add a new validation rule in `validators.ts`.
@@ -147,8 +253,16 @@ Start with `types/project.ts`, then read `store/editorStore.ts`. After that, stu
 - Add a new export checklist item.
 - Add a new runtime action in `runtimeActions.ts`.
 - Add another real playable template loop beside Tap Monster.
+- Change Tap Monster score per tap from 1 to 5.
+- Change timer from 30s to 15s.
+- Change monster animation.
+- Add a second tap target.
+- Change CTA button text.
+- Add a new gate value to Runner Gate.
+- Change cannon damage in Merge Cannon.
+- Add a new collectible type in Gem Collector.
 
-## 22. Future Improvements
+## 33. Future Improvements
 
 - More precise video crop handles and timeline keyframes.
 - AI API integration for generated scenes.
@@ -158,6 +272,6 @@ Start with `types/project.ts`, then read `store/editorStore.ts`. After that, stu
 - Better Phaser playable preview syncing.
 - Cloud save and team collaboration.
 
-## 23. Disclaimer
+## 34. Disclaimer
 
 This is a local educational MVP. It is not an official ad-network tool and does not guarantee production compliance. Always validate exports against the target network requirements before real campaign use.

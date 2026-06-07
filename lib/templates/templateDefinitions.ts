@@ -33,7 +33,7 @@ export const templateDefinitions: TemplateDefinition[] = [
   },
   {
     id: "tap-monster",
-    name: "Tap Monster",
+    name: "Tap Monster Playable",
     difficulty: "easy",
     category: "Tap",
     popularity: 88,
@@ -41,7 +41,7 @@ export const templateDefinitions: TemplateDefinition[] = [
     mainMechanic: "Tap Reaction",
     tags: ["tap", "score", "timer", "reaction"],
     mechanics: ["tap"],
-    recommendedDuration: 15,
+    recommendedDuration: 30,
     description: "Tap a monster as it jumps around the screen before the timer runs out.",
     accentColor: "#f472b6",
     thumbnailClass: "from-pink-100 via-white to-sky-100"

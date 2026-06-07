@@ -21,15 +21,16 @@ interface RuntimeObjectProps {
   object: EditorObject;
   project: PlayableProject;
   onAction: (action?: EditorAction) => void;
+  onLogicAction?: () => void;
 }
 
-export function RuntimeObject({ object, project, onAction }: RuntimeObjectProps) {
+export function RuntimeObject({ object, project, onAction, onLogicAction }: RuntimeObjectProps) {
   if (object.hidden) {
     return null;
   }
 
   const action = getObjectAction(object);
-  const clickable = action && action.type !== "none";
+  const clickable = Boolean(onLogicAction) || (action && action.type !== "none");
 
   return (
     <div
@@ -45,10 +46,14 @@ export function RuntimeObject({ object, project, onAction }: RuntimeObjectProps)
         }
 
         event.stopPropagation();
-        onAction(action);
+        if (onLogicAction) {
+          onLogicAction();
+        } else {
+          onAction(action);
+        }
       }}
     >
-      {renderRuntimeObject(object, project.assets, onAction)}
+      {renderRuntimeObject(object, project.assets, onAction, onLogicAction)}
     </div>
   );
 }
@@ -64,7 +69,8 @@ function getObjectAction(object: EditorObject) {
 function renderRuntimeObject(
   object: EditorObject,
   assets: PlayableAsset[],
-  onAction: (action?: EditorAction) => void
+  onAction: (action?: EditorAction) => void,
+  onLogicAction?: () => void
 ) {
   if (object.type === "text") {
     const props = object.props as TextObjectProps;
@@ -131,7 +137,11 @@ function renderRuntimeObject(
         }}
         onClick={(event) => {
           event.stopPropagation();
-          onAction(props.action ?? object.actions[0]);
+          if (onLogicAction) {
+            onLogicAction();
+          } else {
+            onAction(props.action ?? object.actions[0]);
+          }
         }}
       >
         {props.label}

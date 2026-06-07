@@ -1,5 +1,6 @@
 import type { PlayableProject } from "@/types/project";
 import { estimateProjectBytes } from "@/lib/editor/projectStorage";
+import { validateLogicConfig } from "@/lib/logic/logicValidation";
 
 export type ValidationLevel = "pass" | "warning" | "error";
 
@@ -47,7 +48,7 @@ export function validateProjectForExport(project: PlayableProject): ValidationIt
   const missingVideoSources = videoObjects.filter((object) => !objectHasSource(project, object.id));
   const missingActionTargets = getMissingActionTargets(project);
 
-  return [
+  const baseItems: ValidationItem[] = [
     {
       id: "intro-scene",
       label: "Intro scene",
@@ -147,6 +148,15 @@ export function validateProjectForExport(project: PlayableProject): ValidationIt
           : "Estimated package size is comfortable for local testing."
     }
   ];
+
+  const logicItems: ValidationItem[] = validateLogicConfig(project).map((item) => ({
+    id: `logic-${item.id}`,
+    label: item.label,
+    level: item.level,
+    message: `${item.message} ${item.level === "pass" ? "" : `Fix: ${item.suggestion}`}`.trim()
+  }));
+
+  return [...baseItems, ...logicItems];
 }
 
 export function getExportChecklist(project: PlayableProject): ValidationItem[] {

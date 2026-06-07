@@ -14,6 +14,8 @@ import type {
   PlayableSettings,
   SceneType
 } from "@/types/project";
+import type { LogicAction, LogicObjectRole, PlayableLogicConfig } from "@/types/logic";
+import { createDefaultLogicConfig } from "@/lib/logic/defaultLogicConfigs";
 import {
   deleteProject,
   duplicateProject,
@@ -67,6 +69,13 @@ interface EditorState {
   updateAssetUsage: (assetId: string, usage: AssetUsage) => void;
   removeAsset: (assetId: string) => void;
   setMechanic: (mechanic: InteractionMechanic | null) => void;
+  updateLogicConfig: (patch: Partial<PlayableLogicConfig>) => void;
+  updateLogicSettings: (settings: PlayableLogicConfig["settings"]) => void;
+  setObjectRole: (objectId: string, role: LogicObjectRole["role"]) => void;
+  updateObjectRoleSettings: (objectId: string, settings: LogicObjectRole["settings"]) => void;
+  addLogicAction: (action: Omit<LogicAction, "id">) => void;
+  updateLogicAction: (actionId: string, patch: Partial<LogicAction>) => void;
+  deleteLogicAction: (actionId: string) => void;
   saveProject: () => PlayableProject | null;
   duplicateCurrentProject: () => PlayableProject | null;
   deleteCurrentProject: () => void;
@@ -81,6 +90,10 @@ function createId(prefix: string) {
   }
 
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function createLogicId(prefix: string) {
+  return createId(prefix);
 }
 
 function syncProject(project: PlayableProject | null) {
@@ -616,6 +629,118 @@ export const useEditorStore = create<EditorState>((set, get) => {
     setMechanic: (mechanic) => {
       updateCurrentProject((project) => ({ ...project, mechanic }), "Mechanic updated.");
     },
+    updateLogicConfig: (patch) => {
+      updateCurrentProject(
+        (project) => ({
+          ...project,
+          logicConfig: {
+            ...project.logicConfig,
+            ...patch,
+            score: patch.score ? { ...project.logicConfig.score, ...patch.score } : project.logicConfig.score,
+            timer: patch.timer ? { ...project.logicConfig.timer, ...patch.timer } : project.logicConfig.timer,
+            sceneFlow: patch.sceneFlow ? { ...project.logicConfig.sceneFlow, ...patch.sceneFlow } : project.logicConfig.sceneFlow,
+            settings: patch.settings ? { ...project.logicConfig.settings, ...patch.settings } : project.logicConfig.settings
+          }
+        }),
+        "Gameplay logic updated."
+      );
+    },
+    updateLogicSettings: (settings) => {
+      updateCurrentProject(
+        (project) => ({
+          ...project,
+          logicConfig: {
+            ...project.logicConfig,
+            settings: {
+              ...project.logicConfig.settings,
+              ...settings
+            }
+          }
+        }),
+        "Gameplay settings updated."
+      );
+    },
+    setObjectRole: (objectId, roleName) => {
+      updateCurrentProject(
+        (project) => {
+          const existing = project.logicConfig.objectRoles.find((item) => item.objectId === objectId);
+          const objectRoles = existing
+            ? project.logicConfig.objectRoles.map((item) =>
+                item.objectId === objectId ? { ...item, role: roleName } : item
+              )
+            : [...project.logicConfig.objectRoles, { objectId, role: roleName, settings: {} }];
+
+          return {
+            ...project,
+            logicConfig: {
+              ...project.logicConfig,
+              objectRoles
+            }
+          };
+        },
+        "Playable role updated."
+      );
+    },
+    updateObjectRoleSettings: (objectId, settings) => {
+      updateCurrentProject(
+        (project) => ({
+          ...project,
+          logicConfig: {
+            ...project.logicConfig,
+            objectRoles: project.logicConfig.objectRoles.map((item) =>
+              item.objectId === objectId
+                ? {
+                    ...item,
+                    settings: {
+                      ...item.settings,
+                      ...settings
+                    }
+                  }
+                : item
+            )
+          }
+        }),
+        "Role settings updated."
+      );
+    },
+    addLogicAction: (action) => {
+      updateCurrentProject(
+        (project) => ({
+          ...project,
+          logicConfig: {
+            ...project.logicConfig,
+            actions: [...project.logicConfig.actions, { id: createLogicId("action"), ...action }]
+          }
+        }),
+        "Action added."
+      );
+    },
+    updateLogicAction: (actionId, patch) => {
+      updateCurrentProject(
+        (project) => ({
+          ...project,
+          logicConfig: {
+            ...project.logicConfig,
+            actions: project.logicConfig.actions.map((action) =>
+              action.id === actionId ? { ...action, ...patch, id: action.id } : action
+            )
+          }
+        }),
+        "Action updated."
+      );
+    },
+    deleteLogicAction: (actionId) => {
+      updateCurrentProject(
+        (project) => ({
+          ...project,
+          logicConfig: {
+            ...project.logicConfig,
+            actions: project.logicConfig.actions.filter((action) => action.id !== actionId)
+          }
+        }),
+        "Action deleted."
+      );
+    },
     saveProject: () => {
       const project = get().project;
 
@@ -663,12 +788,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
       const fresh = createProjectFromTemplate(project.templateId);
       const scenes = fresh.scenes;
+      const objects = createDefaultObjects(project.name, scenes);
       const resetProject: PlayableProject = {
         ...fresh,
         id: project.id,
         name: project.name,
         createdAt: project.createdAt,
-        objects: createDefaultObjects(project.name, scenes)
+        objects,
+        logicConfig: createDefaultLogicConfig(project.templateId, scenes, objects, fresh.settings)
       };
 
       commitProject(resetProject, "Template defaults restored. Save to keep them.", null);

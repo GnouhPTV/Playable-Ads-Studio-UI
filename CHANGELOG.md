@@ -4,6 +4,21 @@ All notable changes to Playable Ads Studio will be documented in this file.
 
 This project uses a solo-dev `main` branch workflow. Release tags mark stable checkpoints.
 
+## [0.5.0] - No-Code Playable Logic Editor
+
+### Added
+
+- Added no-code playable logic config with object roles, actions, conditions, score, timer, scene flow, and template-level settings.
+- Added Gameplay, Playable Role, Action Builder, Condition Builder, and Template Guide editor panels.
+- Added editable Tap Monster logic for score per tap, timer duration, target score, random movement, score/timer text roles, CTA, and replay.
+- Added MVP logic configs and runtime behavior for Runner Gate, Merge Cannon, Gem Collector, Intro CTA, and End Card templates.
+- Added logic validation rules for required roles and template readiness.
+
+### Changed
+
+- Preview runtime and exported HTML now read `project.logicConfig` instead of relying only on hardcoded template behavior.
+- Tap Monster template defaults now include final score and replay objects.
+
 ## [0.4.0] - Playable Runtime Engine & Video Export Workflow
 
 ### Added
